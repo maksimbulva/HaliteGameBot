@@ -1,3 +1,5 @@
+#include "pch.h"
+
 #include "game.hpp"
 #include "input.hpp"
 

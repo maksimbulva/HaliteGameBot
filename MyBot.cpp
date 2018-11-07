@@ -1,3 +1,5 @@
+#include "pch.h"
+
 #include "hlt/game.hpp"
 #include "hlt/constants.hpp"
 #include "hlt/log.hpp"
