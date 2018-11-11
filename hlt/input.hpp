@@ -9,7 +9,7 @@
 
 namespace hlt {
 
-std::string_view readToken(const std::string& str, size_t& pos);
+std::string readToken(const std::string& str, size_t& pos);
 
     static std::string get_string() {
         std::string result;

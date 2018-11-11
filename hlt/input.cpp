@@ -4,7 +4,7 @@
 
 namespace hlt {
 
-std::string_view readToken(const std::string& str, size_t& pos) {
+std::string readToken(const std::string& str, size_t& pos) {
     const size_t maxPos = str.size();
     // Skip whitespaces
     for (; pos < maxPos && str[pos] == ' '; ++pos) {
@@ -13,7 +13,7 @@ std::string_view readToken(const std::string& str, size_t& pos) {
     const size_t tokenBegin = pos;
     for (; pos < maxPos && str[pos] != ' '; ++pos) {
     }
-    return std::string_view(str.c_str() + tokenBegin, pos - tokenBegin);
+    return std::string(str.c_str() + tokenBegin, pos - tokenBegin);
 }
 
 }

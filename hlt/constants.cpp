@@ -46,12 +46,12 @@ void Constants::init(std::string inputString) {
 
     size_t i = 0;
     while (i < inputString.size()) {
-        const std::string_view keyStr = readToken(inputString, i);
+        const std::string keyStr = readToken(inputString, i);
         if (keyStr.empty()) {
             break;
         }
 
-        const std::string valueStr{ readToken(inputString, i) };
+        const std::string valueStr = readToken(inputString, i);
         if (valueStr.empty()) {
             log::log("Missing token while reading value for constant key " + std::string{ keyStr } + ".");
             exit(1);
