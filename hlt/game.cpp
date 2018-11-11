@@ -8,7 +8,7 @@
 hlt::Game::Game() : turn_number(0) {
     std::ios_base::sync_with_stdio(false);
 
-    hlt::constants::populate_constants(hlt::get_string());
+    Constants::get().init(std::move(hlt::get_string()));
 
     int num_players;
     std::stringstream input(get_string());

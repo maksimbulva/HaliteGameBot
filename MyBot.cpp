@@ -20,6 +20,7 @@ int main(int argc, char* argv[]) {
     mt19937 rng(rng_seed);
 
     Game game;
+    Constants& constants = Constants::get();
     // At this point "game" variable is populated with initial map data.
     // This is a good place to do computationally expensive start-up pre-processing.
     // As soon as you call "ready" function below, the 2 second per turn timer will start.
@@ -36,7 +37,7 @@ int main(int argc, char* argv[]) {
 
         for (const auto& ship_iterator : me->ships) {
             shared_ptr<Ship> ship = ship_iterator.second;
-            if (game_map->at(ship)->halite < constants::MAX_HALITE / 10 || ship->is_full()) {
+            if (game_map->at(ship)->halite < constants.maxHalite() / 10 || ship->is_full()) {
                 Direction random_direction = ALL_CARDINALS[rng() % 4];
                 command_queue.push_back(ship->move(random_direction));
             } else {
@@ -46,7 +47,7 @@ int main(int argc, char* argv[]) {
 
         if (
             game.turn_number <= 200 &&
-            me->halite >= constants::SHIP_COST &&
+            me->halite >= constants.shipCost() &&
             !game_map->at(me->shipyard)->is_occupied())
         {
             command_queue.push_back(me->shipyard->spawn());

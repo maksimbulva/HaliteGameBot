@@ -1,5 +1,6 @@
 #pragma once
 
+#include "constants.hpp"
 #include "game_map.hpp"
 #include "player.hpp"
 #include "types.hpp"

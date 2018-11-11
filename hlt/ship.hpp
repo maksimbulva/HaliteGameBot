@@ -16,7 +16,7 @@ namespace hlt {
         {}
 
         bool is_full() const {
-            return halite >= constants::MAX_HALITE;
+            return halite >= Constants::get().maxHalite();
         }
 
         Command make_dropoff() const {
