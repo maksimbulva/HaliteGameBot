@@ -1,5 +1,3 @@
-#include "pch.h"
-
 #include "ship.hpp"
 #include "input.hpp"
 

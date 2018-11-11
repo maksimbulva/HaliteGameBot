@@ -1,5 +1,3 @@
-#include "pch.h"
-
 #include "constants.hpp"
 #include "input.hpp"
 #include "log.hpp"

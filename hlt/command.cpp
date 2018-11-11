@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "command.hpp"
 
 #include <iostream>

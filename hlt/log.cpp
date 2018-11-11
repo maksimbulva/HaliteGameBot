@@ -1,5 +1,3 @@
-#include "pch.h"
-
 #include "log.hpp"
 
 #include <fstream>

@@ -1,5 +1,3 @@
-#include "pch.h"
-
 #include "dropoff.hpp"
 #include "input.hpp"
 
