@@ -11,6 +11,8 @@ namespace hlt {
 
 std::string readToken(const std::string& str, size_t& pos);
 
+void readUntilEol();
+
     static std::string get_string() {
         std::string result;
         std::getline(std::cin, result);

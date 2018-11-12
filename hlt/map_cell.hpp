@@ -7,13 +7,15 @@
 
 namespace hlt {
     struct MapCell {
-        Position position;
+        // Position position;
         Halite halite;
         std::shared_ptr<Ship> ship;
         std::shared_ptr<Entity> structure; // only has dropoffs and shipyards; if id is -1, then it's a shipyard, otherwise it's a dropoff
 
+        MapCell() { }
+
         MapCell(int x, int y, Halite halite) :
-            position(x, y),
+            // position(x, y),
             halite(halite)
         {}
 

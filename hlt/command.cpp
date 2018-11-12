@@ -17,3 +17,10 @@ hlt::Command hlt::command::transform_ship_into_dropoff_site(EntityId id) {
 hlt::Command hlt::command::move(EntityId id, hlt::Direction direction) {
     return MOVE + std::to_string(id) + ' ' + static_cast<char>(direction);
 }
+
+namespace hlt {
+
+/*std::string Command::toString() const {
+}*/
+
+}  // namespace hlt

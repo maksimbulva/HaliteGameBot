@@ -47,5 +47,4 @@ cl.exe /FeMyBot.exe /std:c++14 /O2 /MT /EHsc /I . /Fo.\obj\ ^
  .\hlt\log.cpp ^
  .\hlt\player.cpp ^
  .\hlt\ship.cpp ^
- .\MyBot.cpp ^
- .\pch.cpp
+ .\MyBot.cpp
