@@ -20,15 +20,15 @@ namespace hlt {
         }
 
         Command make_dropoff() const {
-            return hlt::command::transform_ship_into_dropoff_site(id);
+            return Command::createBuildDropoffSiteCommand(id);
         }
 
         Command move(Direction direction) const {
-            return hlt::command::move(id, direction);
+            return Command::createMoveCommand(id, direction);
         }
 
         Command stay_still() const {
-            return hlt::command::move(id, Direction::STILL);
+            return Command::createMoveCommand(id, Direction::STILL);
         }
 
         static std::shared_ptr<Ship> _generate(PlayerId player_id);

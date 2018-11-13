@@ -3,10 +3,31 @@
 
 #include <sstream>
 
+namespace hlt {
+
+std::ostream& operator<<(std::ostream& stream, const Command& command) {
+    switch (command.type()) {
+        case Command::SPAWN_SHIP:
+            stream << 'g';
+            break;
+        case Command::BUILD_DROPOFF_SITE:
+            stream << "c " << command.entityId();
+        case Command::MOVE:
+            stream << "m " << command.entityId() << " " << static_cast<char>(command.direction());
+            break;
+        default:
+            log::log("Do not know how to output command of type " + std::to_string(command.type()));
+            exit(1);
+    }
+    return stream;
+}
+
+}
+
 hlt::Game::Game() : turn_number(0) {
     std::ios_base::sync_with_stdio(false);
 
-    Constants::get().init(std::move(hlt::get_string()));
+    Constants::get().init(hlt::get_string());
 
     int num_players;
     std::stringstream input(get_string());

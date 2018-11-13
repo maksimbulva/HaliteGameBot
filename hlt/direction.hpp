@@ -12,6 +12,7 @@ namespace hlt {
         SOUTH = 's',
         WEST = 'w',
         STILL = 'o',
+        DIRECTION_NONE = '\0'
     };
 
     static const std::array<Direction, 4> ALL_CARDINALS = {
