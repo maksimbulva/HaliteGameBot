@@ -28,12 +28,12 @@ int main(int argc, char* argv[]) {
 
     for (;;) {
         game.update_frame();
-        shared_ptr<Player> me = game.me;
+        Player& me = game.myPlayer();
         unique_ptr<GameMap>& game_map = game.game_map;
 
         vector<Command> command_queue;
 
-        for (const auto& ship_iterator : me->ships) {
+        for (const auto& ship_iterator : me.ships) {
             shared_ptr<Ship> ship = ship_iterator.second;
             if (game_map->at(ship)->halite < constants.maxHalite() / 10 || ship->is_full()) {
                 Direction random_direction = ALL_CARDINALS[rng() % 4];
@@ -45,10 +45,10 @@ int main(int argc, char* argv[]) {
 
         if (
             game.turn_number <= 200 &&
-            me->halite >= constants.shipCost() &&
-            !game_map->at(me->shipyard)->is_occupied())
+            me.halite >= constants.shipCost() &&
+            !game_map->at(me.shipyard)->is_occupied())
         {
-            command_queue.push_back(me->shipyard->spawn());
+            command_queue.push_back(me.shipyard->spawn());
         }
 
         if (!game.end_turn(command_queue)) {

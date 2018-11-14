@@ -2,6 +2,7 @@
 #include "input.hpp"
 
 #include <sstream>
+#include <stdio.h>
 
 namespace hlt {
 
@@ -22,23 +23,38 @@ std::ostream& operator<<(std::ostream& stream, const Command& command) {
     return stream;
 }
 
-}
-
-hlt::Game::Game() : turn_number(0) {
-    std::ios_base::sync_with_stdio(false);
-
-    Constants::get().init(hlt::get_string());
-
+void Game::readPlayers() {
     int num_players;
-    std::stringstream input(get_string());
-    input >> num_players >> my_id;
+    scanf("%d %d", &num_players, &my_id);
+    readUntilEol();
 
     log::open(my_id);
 
-    for (int i = 0; i < num_players; ++i) {
-        players.push_back(Player::_generate());
+    players.reserve(num_players);
+    for (; num_players > 0; --num_players) {
+        int playerId;
+        int shipyardX;
+        int shipyardY;
+        scanf("%d %d %d", &playerId, &shipyardX, &shipyardY);
+        readUntilEol();
+        players.emplace_back(static_cast<PlayerId>(playerId), shipyardX, shipyardY);
     }
-    me = players[my_id];
+
+    m_myPlayer = &players[my_id];
+}
+
+}  // namespace hlt
+
+hlt::Game::Game()
+    :
+    turn_number(0),
+    m_myPlayer(nullptr)
+{
+    std::ios_base::sync_with_stdio(false);
+
+    Constants::get().init(hlt::get_string());
+    readPlayers();
+
     game_map = GameMap::_generate();
 }
 
@@ -57,20 +73,20 @@ void hlt::Game::update_frame() {
         Halite halite;
         hlt::get_sstream() >> current_player_id >> num_ships >> num_dropoffs >> halite;
 
-        players[current_player_id]->_update(num_ships, num_dropoffs, halite);
+        players[current_player_id]._update(num_ships, num_dropoffs, halite);
     }
 
     game_map->_update();
 
     for (const auto& player : players) {
-        for (auto& ship_iterator : player->ships) {
+        for (auto& ship_iterator : player.ships) {
             auto ship = ship_iterator.second;
             game_map->at(ship)->mark_unsafe(ship);
         }
 
-        game_map->at(player->shipyard)->structure = player->shipyard;
+        game_map->at(player.shipyard)->structure = player.shipyard;
 
-        for (auto& dropoff_iterator : player->dropoffs) {
+        for (auto& dropoff_iterator : player.dropoffs) {
             auto dropoff = dropoff_iterator.second;
             game_map->at(dropoff)->structure = dropoff;
         }

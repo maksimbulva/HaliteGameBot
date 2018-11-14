@@ -10,15 +10,21 @@
 
 namespace hlt {
     struct Game {
+        Player& myPlayer() { return *m_myPlayer; }
+
         int turn_number;
         PlayerId my_id;
-        std::vector<std::shared_ptr<Player>> players;
-        std::shared_ptr<Player> me;
+        std::vector<Player> players;
         std::unique_ptr<GameMap> game_map;
 
         Game();
         void ready(const std::string& name);
         void update_frame();
         bool end_turn(const std::vector<Command>& commands);
+
+    private:
+        void readPlayers();
+
+        Player* m_myPlayer;
     };
 }
