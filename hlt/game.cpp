@@ -26,7 +26,6 @@ std::ostream& operator<<(std::ostream& stream, const Command& command) {
 void Game::readPlayers() {
     int num_players;
     scanf("%d %d", &num_players, &my_id);
-    readUntilEol();
 
     log::open(my_id);
 
@@ -36,11 +35,12 @@ void Game::readPlayers() {
         int shipyardX;
         int shipyardY;
         scanf("%d %d %d", &playerId, &shipyardX, &shipyardY);
-        readUntilEol();
         players.emplace_back(static_cast<PlayerId>(playerId), shipyardX, shipyardY);
     }
 
     m_myPlayer = &players[my_id];
+
+    readUntilEol();
 }
 
 }  // namespace hlt
@@ -84,7 +84,10 @@ void hlt::Game::update_frame() {
             game_map->at(ship)->mark_unsafe(ship);
         }
 
-        game_map->at(player.shipyard)->structure = player.shipyard;
+        // TODO
+        const Shipyard& shipyard = player.shipyard();
+        game_map->at(shipyard.position())->structure =
+            std::make_shared<Shipyard>(shipyard.playerId(), shipyard.position());
 
         for (auto& dropoff_iterator : player.dropoffs) {
             auto dropoff = dropoff_iterator.second;

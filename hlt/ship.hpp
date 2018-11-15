@@ -7,30 +7,41 @@
 #include <memory>
 
 namespace hlt {
-    struct Ship : Entity {
-        Halite halite;
 
-        Ship(PlayerId player_id, EntityId ship_id, int x, int y, Halite halite) :
-            Entity(player_id, ship_id, x, y),
-            halite(halite)
-        {}
+class Ship : public Entity {
+public:
+    inline Ship(
+        const PlayerId playerId,
+        const EntityId entityId,
+        const Position position,
+        const Halite halite
+    )
+        :
+        Entity(playerId, entityId, position),
+        m_halite(halite)
+    {
+    }
 
-        bool is_full() const {
-            return halite >= Constants::get().maxHalite();
-        }
+    const bool isFull() const {
+        return m_halite >= Constants::get().maxHalite();
+    }
 
-        Command make_dropoff() const {
-            return Command::createBuildDropoffSiteCommand(id);
-        }
+    Command make_dropoff() const {
+        return Command::createBuildDropoffSiteCommand(m_entityId);
+    }
 
-        Command move(Direction direction) const {
-            return Command::createMoveCommand(id, direction);
-        }
+    Command move(Direction direction) const {
+        return Command::createMoveCommand(m_entityId, direction);
+    }
 
-        Command stay_still() const {
-            return Command::createMoveCommand(id, Direction::STILL);
-        }
+    Command stay_still() const {
+        return Command::createMoveCommand(m_entityId, Direction::STILL);
+    }
 
-        static std::shared_ptr<Ship> _generate(PlayerId player_id);
-    };
+    static std::shared_ptr<Ship> _generate(PlayerId player_id);
+
+protected:
+    Halite m_halite;
+};
+
 }

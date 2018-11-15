@@ -4,11 +4,14 @@
 #include "command.hpp"
 
 namespace hlt {
-    struct Shipyard : Entity {
-        Shipyard(PlayerId owner, int x, int y) : Entity(owner, -1, x, y) {}
 
-        Command spawn() {
-            return Command::createSpawnShipCommand();
-        }
-    };
+class Shipyard : public Entity {
+public:
+    inline Shipyard(const PlayerId playerId, const Position position)
+        :
+        Entity(playerId, -1, position)
+    {
+    }
+};
+
 }

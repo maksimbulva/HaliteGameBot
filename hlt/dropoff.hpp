@@ -5,9 +5,16 @@
 #include <memory>
 
 namespace hlt {
-    struct Dropoff : Entity {
-        using Entity::Entity;
 
-        static std::shared_ptr<Dropoff> _generate(PlayerId player_id);
-    };
+class Dropoff : public Entity {
+public:
+    inline Dropoff(const PlayerId playerId, const EntityId entityId, const Position position)
+        :
+        Entity(playerId, entityId, position)
+    {
+    }
+
+    static std::shared_ptr<Dropoff> _generate(PlayerId player_id);
+};
+
 }

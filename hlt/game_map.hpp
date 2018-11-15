@@ -22,15 +22,15 @@ public:
     }
 
     MapCell* at(const Entity& entity) {
-        return at(entity.position);
+        return at(entity.position());
     }
 
     MapCell* at(const Entity* entity) {
-        return at(entity->position);
+        return at(entity->position());
     }
 
     MapCell* at(const std::shared_ptr<Entity>& entity) {
-        return at(entity->position);
+        return at(entity->position());
     }
 
     int calculate_distance(const Position& source, const Position& target) {
@@ -80,8 +80,8 @@ public:
 
     Direction naive_navigate(std::shared_ptr<Ship> ship, const Position& destination) {
         // get_unsafe_moves normalizes for us
-        for (auto direction : get_unsafe_moves(ship->position, destination)) {
-            Position target_pos = ship->position.directional_offset(direction);
+        for (auto direction : get_unsafe_moves(ship->position(), destination)) {
+            Position target_pos = ship->position().directional_offset(direction);
             if (!at(target_pos)->is_occupied()) {
                 at(target_pos)->mark_unsafe(ship);
                 return direction;

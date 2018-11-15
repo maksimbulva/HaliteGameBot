@@ -7,13 +7,13 @@ void hlt::Player::_update(int num_ships, int num_dropoffs, Halite halite) {
     ships.clear();
     for (int i = 0; i < num_ships; ++i) {
         std::shared_ptr<hlt::Ship> ship = hlt::Ship::_generate(id);
-        ships[ship->id] = ship;
+        ships[ship->entityId()] = ship;
     }
 
     dropoffs.clear();
     for (int i = 0; i < num_dropoffs; ++i) {
         std::shared_ptr<hlt::Dropoff> dropoff = hlt::Dropoff::_generate(id);
-        dropoffs[dropoff->id] = dropoff;
+        dropoffs[dropoff->entityId()] = dropoff;
     }
 }
 
