@@ -17,9 +17,10 @@ GameMap::~GameMap() {
 }
 
 void GameMap::_update() {
-    for (auto& cell : m_cells) {
+    // TODO
+    /*for (auto& cell : m_cells) {
         cell.ship.reset();
-    }
+    }*/
 
     int updateCount;
     scanf("%d", &updateCount);

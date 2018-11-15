@@ -9,8 +9,8 @@ namespace hlt {
     struct MapCell {
         // Position position;
         Halite halite;
-        std::shared_ptr<Ship> ship;
-        std::shared_ptr<Entity> structure; // only has dropoffs and shipyards; if id is -1, then it's a shipyard, otherwise it's a dropoff
+        // std::shared_ptr<Ship> ship;
+        // std::shared_ptr<Entity> structure; // only has dropoffs and shipyards; if id is -1, then it's a shipyard, otherwise it's a dropoff
 
         MapCell() { }
 
@@ -20,19 +20,20 @@ namespace hlt {
         {}
 
         bool is_empty() const {
-            return !ship && !structure;
+            // TODO
+            return true;
+            // return !ship && !structure;
         }
 
         bool is_occupied() const {
-            return static_cast<bool>(ship);
+            // TODO
+            return false;
+            // return static_cast<bool>(ship);
         }
 
-        bool has_structure() const {
-            return static_cast<bool>(structure);
-        }
-
-        void mark_unsafe(std::shared_ptr<Ship>& ship) {
-            this->ship = ship;
+        void mark_unsafe(const Ship& ship) {
+            // TODO
+            // this->ship = ship;
         }
     };
 }

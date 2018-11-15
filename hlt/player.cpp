@@ -1,27 +1,30 @@
 #include "player.hpp"
-#include "input.hpp"
+
+#include "factory.hpp"
+
+namespace hlt {
+
+Player::Player(const PlayerId player_id, const Position shipyard) :
+    m_playerId(player_id),
+    m_halite(0),
+    m_shipyard(player_id, shipyard)
+{
+}
 
 void hlt::Player::_update(int num_ships, int num_dropoffs, Halite halite) {
-    this->halite = halite;
+    m_halite = halite;
 
-    ships.clear();
-    for (int i = 0; i < num_ships; ++i) {
-        std::shared_ptr<hlt::Ship> ship = hlt::Ship::_generate(id);
-        ships[ship->entityId()] = ship;
+    m_ships.clear();
+    m_ships.reserve(num_ships);
+    for (; num_ships > 0; --num_ships) {
+        m_ships.push_back(createShipFromInputLine(m_playerId));
     }
 
-    dropoffs.clear();
-    for (int i = 0; i < num_dropoffs; ++i) {
-        std::shared_ptr<hlt::Dropoff> dropoff = hlt::Dropoff::_generate(id);
-        dropoffs[dropoff->entityId()] = dropoff;
+    m_dropoffs.clear();
+    m_dropoffs.reserve(num_dropoffs);
+    for (; num_dropoffs > 0; --num_dropoffs) {
+        m_dropoffs.push_back(createDropoffFromInputLine(m_playerId));
     }
 }
 
-std::shared_ptr<hlt::Player> hlt::Player::_generate() {
-    PlayerId player_id;
-    int shipyard_x;
-    int shipyard_y;
-    hlt::get_sstream() >> player_id >> shipyard_x >> shipyard_y;
-
-    return std::make_shared<hlt::Player>(player_id, shipyard_x, shipyard_y);
-}
+}  // namespace hlt

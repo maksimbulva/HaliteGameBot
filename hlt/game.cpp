@@ -1,4 +1,6 @@
 #include "game.hpp"
+
+#include "factory.hpp"
 #include "input.hpp"
 
 #include <sstream>
@@ -31,16 +33,10 @@ void Game::readPlayers() {
 
     players.reserve(num_players);
     for (; num_players > 0; --num_players) {
-        int playerId;
-        int shipyardX;
-        int shipyardY;
-        scanf("%d %d %d", &playerId, &shipyardX, &shipyardY);
-        players.emplace_back(static_cast<PlayerId>(playerId), shipyardX, shipyardY);
+        players.push_back(createPlayerFromInput());
     }
 
     m_myPlayer = &players[my_id];
-
-    readUntilEol();
 }
 
 }  // namespace hlt
@@ -79,19 +75,19 @@ void hlt::Game::update_frame() {
     game_map->_update();
 
     for (const auto& player : players) {
-        for (auto& ship_iterator : player.ships) {
-            auto ship = ship_iterator.second;
+        for (const auto& ship : player.ships()) {
             game_map->at(ship)->mark_unsafe(ship);
         }
 
         // TODO
-        const Shipyard& shipyard = player.shipyard();
+/*        const Shipyard& shipyard = player.shipyard();
         game_map->at(shipyard.position())->structure =
             std::make_shared<Shipyard>(shipyard.playerId(), shipyard.position());
+*/
 
-        for (auto& dropoff_iterator : player.dropoffs) {
-            auto dropoff = dropoff_iterator.second;
-            game_map->at(dropoff)->structure = dropoff;
+        for (const auto& dropoff : player.dropoffs()) {
+            // TODO
+            // game_map->at(dropoff)->structure = dropoff;
         }
     }
 }

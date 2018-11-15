@@ -1,16 +1,14 @@
 #pragma once
 
-#include "entity.hpp"
-#include "constants.hpp"
 #include "command.hpp"
-
-#include <memory>
+#include "constants.hpp"
+#include "entity.hpp"
 
 namespace hlt {
 
 class Ship : public Entity {
 public:
-    inline Ship(
+    Ship(
         const PlayerId playerId,
         const EntityId entityId,
         const Position position,
@@ -37,8 +35,6 @@ public:
     Command stay_still() const {
         return Command::createMoveCommand(m_entityId, Direction::STILL);
     }
-
-    static std::shared_ptr<Ship> _generate(PlayerId player_id);
 
 protected:
     Halite m_halite;

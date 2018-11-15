@@ -1,6 +1,5 @@
 #pragma once
 
-#include "types.hpp"
 #include "map_cell.hpp"
 #include "types.hpp"
 
@@ -78,10 +77,10 @@ public:
         return possible_moves;
     }
 
-    Direction naive_navigate(std::shared_ptr<Ship> ship, const Position& destination) {
+/*    Direction naive_navigate(const Ship& ship, const Position& destination) {
         // get_unsafe_moves normalizes for us
-        for (auto direction : get_unsafe_moves(ship->position(), destination)) {
-            Position target_pos = ship->position().directional_offset(direction);
+        for (auto direction : get_unsafe_moves(ship.position(), destination)) {
+            Position target_pos = ship.position().directional_offset(direction);
             if (!at(target_pos)->is_occupied()) {
                 at(target_pos)->mark_unsafe(ship);
                 return direction;
@@ -90,6 +89,7 @@ public:
 
         return Direction::STILL;
     }
+*/
 
     inline const size_t toIndex(Position pos) const {
         return static_cast<size_t>(pos.x + pos.y * m_width);

@@ -33,19 +33,18 @@ int main(int argc, char* argv[]) {
 
         vector<Command> command_queue;
 
-        for (const auto& ship_iterator : me.ships) {
-            shared_ptr<Ship> ship = ship_iterator.second;
-            if (game_map->at(ship)->halite < constants.maxHalite() / 10 || ship->isFull()) {
+        for (const auto& ship : me.ships()) {
+            if (game_map->at(ship)->halite < constants.maxHalite() / 10 || ship.isFull()) {
                 Direction random_direction = ALL_CARDINALS[rng() % 4];
-                command_queue.push_back(ship->move(random_direction));
+                command_queue.push_back(ship.move(random_direction));
             } else {
-                command_queue.push_back(ship->stay_still());
+                command_queue.push_back(ship.stay_still());
             }
         }
 
         if (
             game.turn_number <= 200 &&
-            me.halite >= constants.shipCost() &&
+            me.halite() >= constants.shipCost() &&
             !game_map->at(me.shipyard())->is_occupied())
         {
             command_queue.push_back(Command::createSpawnShipCommand());
