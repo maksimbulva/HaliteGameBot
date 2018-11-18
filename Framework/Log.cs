@@ -37,7 +37,7 @@ namespace HaliteGameBot.Framework
 
         static private void WriteToFile(IEnumerable<string> messages)
         {
-            using (var writer = new StreamWriter(_filename))
+            using (var writer = new StreamWriter(_filename, append: true))
             {
                 foreach (string message in messages)
                 {
