@@ -15,6 +15,10 @@ namespace HaliteGameBot.Framework
         static public void SetFileName(string filename)
         {
             _filename = filename;
+            if (File.Exists(_filename))
+            {
+                File.Delete(_filename);
+            }
         }
 
         static public void Write(string message)
