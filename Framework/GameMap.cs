@@ -9,6 +9,7 @@ namespace HaliteGameBot.Framework
         public int Height { get; }
 
         public List<int> Halite { get; }
+        public List<bool> Occupied { get; }
 
         public static GameMap CreateFromInput()
         {
@@ -38,9 +39,10 @@ namespace HaliteGameBot.Framework
             Width = width;
             Height = height;
 
-            int mapCells = width * height;
+            int mapCellCount = width * height;
             Halite = new List<int>(width * height);
-            Halite.AddRange(Enumerable.Repeat(0, mapCells));
+            Halite.AddRange(Enumerable.Repeat(0, mapCellCount));
+            Occupied.AddRange(Enumerable.Repeat(false, mapCellCount));
         }
 
         public void UpdateFromInput()
@@ -57,6 +59,8 @@ namespace HaliteGameBot.Framework
         }
 
         public int GetIndex(int x, int y) => x + y * Width;
+
+        public int GetIndex(Position position) => position.X + position.Y * Width;
 
         public int GetHaliteAt(Entity entity) => Halite[GetIndex(entity.Position.X, entity.Position.Y)];
     }
