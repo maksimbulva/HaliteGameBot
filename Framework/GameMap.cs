@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace HaliteGameBot.Framework
@@ -40,8 +41,9 @@ namespace HaliteGameBot.Framework
             Height = height;
 
             int mapCellCount = width * height;
-            Halite = new List<int>(width * height);
+            Halite = new List<int>(mapCellCount);
             Halite.AddRange(Enumerable.Repeat(0, mapCellCount));
+            Occupied = new List<bool>(mapCellCount);
             Occupied.AddRange(Enumerable.Repeat(false, mapCellCount));
         }
 
@@ -62,6 +64,18 @@ namespace HaliteGameBot.Framework
 
         public int GetIndex(Position position) => position.X + position.Y * Width;
 
+        public void SetHaliteAt(Entity entity, int value)
+        {
+            Halite[GetIndex(entity.Position.X, entity.Position.Y)] = value;
+        }
+
         public int GetHaliteAt(Entity entity) => Halite[GetIndex(entity.Position.X, entity.Position.Y)];
+
+        public void ChangeHaliteAt(Entity entity, int diff)
+        {
+            int index = GetIndex(entity.Position.X, entity.Position.Y);
+            int halite = Halite[index];
+            Halite[index] = Math.Max(0, halite + diff);
+        }
     }
 }

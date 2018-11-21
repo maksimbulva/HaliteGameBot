@@ -4,33 +4,46 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HaliteGameBot.Framework;
+using HaliteGameBot.Search.GameActions;
 
 namespace HaliteGameBot.Search
 {
     class GameState
     {
+        private readonly Game _game;
+        private readonly Stack<IGameAction> _actions = new Stack<IGameAction>(32);
+
         public GameState(Game game)
         {
+            _game = game;
         }
 
-        public void Play(GameAction action)
+        public void Play(IGameAction action)
         {
-
+            _actions.Push(action);
+            action.Play(_game);
         }
 
         public void Undo()
         {
-
+            IGameAction action = _actions.Pop();
+            action.Undo(_game);
         }
 
         public void UndoAll()
         {
-
+            while (_actions.Count > 0)
+            {
+                Undo();
+            }
         }
 
-        public IEnumerable<GameAction> GenerateActions()
+        // TODO: consider using IEnumerable<IGameAction> here
+        public List<IGameAction> GenerateActions(Ship ship)
         {
-            return null;
+            List<IGameAction> results = new List<IGameAction>(8);
+            results.Add(new StayStill(ship));
+            return results;
         }
     }
 }

@@ -27,6 +27,7 @@ namespace HaliteGameBot
                 string turnOutput = string.Join(" ", commands.Select(command => command.ToString()).ToArray());
                 Console.WriteLine(turnOutput);
                 Console.Out.Flush();
+                bot.OnMoveCompleted();
             }
         }
     }

@@ -27,8 +27,17 @@ namespace HaliteGameBot.Search
             _priorityQueue = new C5.IntervalHeap<Node>(
                 Capacity,
                 NodeByPriorityComparator.Instance,
-                C5.MemoryType.Strict
-           );
+                // I would rather prefer C5.MemoryType.Strict, but it is not supported yet
+                C5.MemoryType.Normal);
+        }
+
+        public void Clear()
+        {
+            // TODO: consider perf issues
+            while (!_priorityQueue.IsEmpty)
+            {
+                _priorityQueue.DeleteMin();
+            }
         }
 
         public Node Dequeue()

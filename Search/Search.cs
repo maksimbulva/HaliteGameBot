@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using HaliteGameBot.Framework;
+using HaliteGameBot.Search.GameActions;
 
 namespace HaliteGameBot.Search
 {
@@ -12,29 +13,55 @@ namespace HaliteGameBot.Search
 
         private readonly List<Node> _parentsBuffer = new List<Node>(32);
 
-        public bool HasNodeToProcess { get { return !_priorityQueue.IsEmpty; } }
+        public long ActionsGenerated { get; private set; }
+        public long NodesGenerated { get; private set; }
 
-        public Search(Game game, Strategy strategy, int maxQueueSize)
+        public Search(Game game, Strategy strategy, int queueCapacity)
         {
+            _game = game;
             _strategy = strategy;
             _tree = new Tree(game);
-            _priorityQueue = new PriorityQueue(maxQueueSize);
-
-
-            Evaluate(new GameState(game), _tree.Root);
-            _priorityQueue.Enqueue(_tree.Root);
+            _priorityQueue = new PriorityQueue(queueCapacity);
         }
 
-        public void Run()
+        public void Clear()
         {
+            _tree.Clear();
+            while (!_priorityQueue.IsEmpty)
+            {
+                _priorityQueue.Dequeue();
+            }
+
+            ActionsGenerated = 0;
+            NodesGenerated = 0;
+        }
+
+        public void Run(Ship ship)
+        {
+            Evaluate(new GameState(_game), _tree.Root);
+            _priorityQueue.Enqueue(_tree.Root);
+
             // TODO - for the moment, limit the number of nodes to 100
             for (int i = 0; i < 100; ++i)
             {
-                ProcessNode(_priorityQueue.Dequeue(), _strategy);
+                ProcessNode(_priorityQueue.Dequeue(), ship, _strategy);
             }
         }
 
-        private void ProcessNode(Node node, Strategy strategy)
+        public IGameAction GetBestAction()
+        {
+            Node bestChild = null;
+            _tree.Root?.Children.ForEach(node =>
+            {
+                if (bestChild == null || node.Evaluation > bestChild.Evaluation)
+                {
+                    bestChild = node;
+                }
+            });
+            return bestChild.GameAction;
+        }
+
+        private void ProcessNode(Node node, Ship ship, Strategy strategy)
         {
             if (node == null)
             {
@@ -47,15 +74,21 @@ namespace HaliteGameBot.Search
             // Play node actions from root to the given node
             for (int i = _parentsBuffer.Count - 1; i >= 0; --i)
             {
-                gameState.Play(_parentsBuffer[i].GameAction);
+                IGameAction action = _parentsBuffer[i].GameAction;
+                if (action != null)
+                {
+                    gameState.Play(action);
+                }
             }
 
             int childDepth = node.Depth + 1;
             List<Node> children = null;
 
             double maxChildrenEvaluation = double.MinValue;
+            List<IGameAction> actions = gameState.GenerateActions(ship);
+            ActionsGenerated += actions.Count;
 
-            foreach (GameAction action in gameState.GenerateActions())
+            foreach (IGameAction action in actions)
             {
                 gameState.Play(action);
 
@@ -69,6 +102,7 @@ namespace HaliteGameBot.Search
                 if (_priorityQueue.WillEnqueue(priority))
                 {
                     Node child = new Node(node, action, childDepth);
+                    ++NodesGenerated;
                     if (children == null)
                     {
                         children = new List<Node>(5);

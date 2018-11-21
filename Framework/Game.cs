@@ -11,6 +11,8 @@ namespace HaliteGameBot.Framework
 
         public GameMap GameMap { get; private set; }
 
+        public Dictionary<int, Ship> MyShips { get; }
+
         public static Game CreateFromInput()
         {
             Game game = new Game();
@@ -21,6 +23,7 @@ namespace HaliteGameBot.Framework
 
         private Game()
         {
+            MyShips = new Dictionary<int, Ship>(16);
         }
 
         public void ReadFrameUpdate()
@@ -45,6 +48,8 @@ namespace HaliteGameBot.Framework
             GameMap.UpdateFromInput();
 
             SetMapCellsOccupiedStatus(true);
+
+            UpdateMyShipsDict();
 
                 // TODO
                 /*        const Shipyard& shipyard = player.shipyard();
@@ -82,6 +87,12 @@ namespace HaliteGameBot.Framework
             {
                 player.Ships.ForEach(ship => GameMap.Occupied[GameMap.GetIndex(ship.Position)] = status);
             }
+        }
+
+        private void UpdateMyShipsDict()
+        {
+            MyShips.Clear();
+            MyPlayer.Ships.ForEach(ship => MyShips.Add(ship.EntityId, ship));
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HaliteGameBot.Search.GameActions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,7 @@ namespace HaliteGameBot.Search
     class Node
     {
         public Node Parent { get; }
-        public GameAction GameAction { get; }
+        public IGameAction GameAction { get; }
         public int Depth { get; }
 
         public double Evaluation;
@@ -17,7 +18,7 @@ namespace HaliteGameBot.Search
 
         public List<Node> Children { get; set; }
 
-        public Node(Node parent, GameAction gameAction, int depth)
+        public Node(Node parent, IGameAction gameAction, int depth)
         {
             Parent = parent;
             GameAction = gameAction;

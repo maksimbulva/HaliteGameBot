@@ -2,7 +2,7 @@
 {
     class Ship : Entity
     {
-        public int Halite { get; private set; }
+        public int Halite { get; set; }
 
         public bool IsFull => Halite >= Constants.MaxHalite;
 
