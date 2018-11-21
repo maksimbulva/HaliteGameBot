@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using HaliteGameBot.Framework;
 using HaliteGameBot.Framework.Commands;
+using HaliteGameBot.Search;
 using HaliteGameBot.Search.GameActions;
 
 namespace HaliteGameBot
@@ -60,6 +61,7 @@ namespace HaliteGameBot
 
         public void OnMoveCompleted()
         {
+            _searches.ForEach(search => LogSearchStats(search.Stats));
             _searches.ForEach(search => search.Clear());
         }
 
@@ -75,6 +77,11 @@ namespace HaliteGameBot
                 return new Move(entityId, Direction.STAY_STILL);
             }
             throw new NotImplementedException();
+        }
+
+        private static void LogSearchStats(ISearchStats stats)
+        {
+            Log.Write($"[{stats.ThreadId}] {stats.Duration.Milliseconds}ms {stats.ActionCount} actions, {stats.NodeCount} nodes");
         }
     }
 } 

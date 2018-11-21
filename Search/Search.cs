@@ -13,8 +13,8 @@ namespace HaliteGameBot.Search
 
         private readonly List<Node> _parentsBuffer = new List<Node>(32);
 
-        public long ActionsGenerated { get; private set; }
-        public long NodesGenerated { get; private set; }
+        private SearchStats _stats;
+        public ISearchStats Stats { get => _stats; }
 
         public Search(Game game, Strategy strategy, int queueCapacity)
         {
@@ -31,13 +31,12 @@ namespace HaliteGameBot.Search
             {
                 _priorityQueue.Dequeue();
             }
-
-            ActionsGenerated = 0;
-            NodesGenerated = 0;
         }
 
         public void Run(Ship ship)
         {
+            _stats = new SearchStats();
+
             Evaluate(new GameState(_game), _tree.Root);
             _priorityQueue.Enqueue(_tree.Root);
 
@@ -46,6 +45,8 @@ namespace HaliteGameBot.Search
             {
                 ProcessNode(_priorityQueue.Dequeue(), ship, _strategy);
             }
+
+            _stats.OnSearchFinished();
         }
 
         public IGameAction GetBestAction()
@@ -86,7 +87,7 @@ namespace HaliteGameBot.Search
 
             double maxChildrenEvaluation = double.MinValue;
             List<IGameAction> actions = gameState.GenerateActions(ship);
-            ActionsGenerated += actions.Count;
+            _stats.ActionCount += actions.Count;
 
             foreach (IGameAction action in actions)
             {
@@ -102,7 +103,7 @@ namespace HaliteGameBot.Search
                 if (_priorityQueue.WillEnqueue(priority))
                 {
                     Node child = new Node(node, action, childDepth);
-                    ++NodesGenerated;
+                    ++_stats.NodeCount;
                     if (children == null)
                     {
                         children = new List<Node>(5);

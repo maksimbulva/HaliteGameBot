@@ -66,10 +66,12 @@
     <Compile Include="Search\GameActions\IGameAction.cs" />
     <Compile Include="Search\GameActions\StayStill.cs" />
     <Compile Include="Search\GameState.cs" />
+    <Compile Include="Search\ISearchStats.cs" />
     <Compile Include="Search\NodeByPriorityComparator.cs" />
     <Compile Include="Search\PriorityQueue.cs" />
     <Compile Include="Search\Search.cs" />
     <Compile Include="Search\Node.cs" />
+    <Compile Include="Search\SearchStats.cs" />
     <Compile Include="Search\Tree.cs" />
     <Compile Include="Strategy.cs" />
   </ItemGroup>
