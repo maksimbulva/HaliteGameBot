@@ -11,6 +11,6 @@
 
         public int PlayerId { get; protected set; }
         public int EntityId { get; protected set; }
-        public Position Position { get; protected set; }
+        public Position Position { get; set; }
     }
 }

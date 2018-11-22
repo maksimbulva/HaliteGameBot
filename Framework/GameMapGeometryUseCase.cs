@@ -2,8 +2,8 @@
 {
     static class GameMapGeometryUseCase
     {
-        public static int IncCoord(int x, int maxCoord) => ++x < maxCoord ? x : x - maxCoord;
+        public static int IncCoord(int c, int maxCoord) => ++c < maxCoord ? c : c - maxCoord;
 
-        public static int DecCoord(int x, int maxCoord) => --x >= 0 ? x : x + maxCoord;
+        public static int DecCoord(int c, int maxCoord) => --c >= 0 ? c : c + maxCoord;
     }
 }

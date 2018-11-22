@@ -46,7 +46,7 @@ namespace HaliteGameBot
                 Search.Search search = _searches[i];
                 search.Run(ship);
                 IGameAction action = search.GetBestAction();
-                commands.Add(CreateCommand(ship.EntityId, action));
+                commands.Add(CommandFactory.FromAction(action, ship.EntityId));
             }
 
             if (_game.TurnNumber <= 200
@@ -70,18 +70,9 @@ namespace HaliteGameBot
             strategy: _strategy,
             queueCapacity: SearchSettings.QUEUE_CAPACITY);
 
-        private ICommand CreateCommand(int entityId, IGameAction action)
-        {
-            if (action == null || action is StayStill)
-            {
-                return new Move(entityId, Direction.STAY_STILL);
-            }
-            throw new NotImplementedException();
-        }
-
         private static void LogSearchStats(ISearchStats stats)
         {
-            Log.Write($"[{stats.ThreadId}] {stats.Duration.Milliseconds}ms {stats.ActionCount} actions, {stats.NodeCount} nodes");
+            Log.Write($"[{stats.ThreadId}] {(int)stats.Duration.TotalMilliseconds}ms {stats.ActionCount} actions, {stats.NodeCount} nodes");
         }
     }
 } 

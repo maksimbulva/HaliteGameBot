@@ -12,11 +12,6 @@ namespace HaliteGameBot.Framework
             Direction.SOUTH,
         };
 
-        public static Direction RandomCardinalDirection(Random random)
-        {
-            return AllCardinals[random.Next(AllCardinals.Length)];
-        }
-
         public static char ToChar(Direction direction)
         {
             switch (direction)

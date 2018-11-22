@@ -9,6 +9,8 @@ namespace HaliteGameBot
         static void Main(string[] args)
         {
             Constants.Init(Console.ReadLine());
+            GameMechanicsHelper.Init();
+
             Game game = Game.CreateFromInput();
 
             Log.SetFileName($"bot-{game.MyPlayer.Id}.log");

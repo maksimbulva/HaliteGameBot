@@ -6,35 +6,32 @@ namespace HaliteGameBot.Search.GameActions
     sealed class StayStill : IGameAction
     {
         private readonly Ship _ship;
-        private int _haliteInCellOldValue;
-        private int _haliteOnShipOldValue;
+        private readonly int _haliteCollected;
 
-        public StayStill(Ship ship)
+        public StayStill(Game game, Ship ship)
         {
             _ship = ship;
+
+            GameMap map = game.GameMap;
+            int haliteInCellOldValue = map.GetHaliteAt(_ship);
+
+            int haliteInCellNewValue = Math.Min(
+                _ship.Halite + GameMechanicsHelper.HaliteToCollect(haliteInCellOldValue),
+                Constants.MaxHalite);
+
+            _haliteCollected = haliteInCellNewValue - _ship.Halite;
         }
 
         public void Play(Game game)
         {
-            _haliteOnShipOldValue = _ship.Halite;
-            GameMap map = game.GameMap;
-            _haliteInCellOldValue = map.GetHaliteAt(_ship);
-            // TODO: This is not a correct formula (we need to do calculations in float numbers
-            // and then round up to the nearest integer)
-            // But for now, this should be insignificant
-            int haliteCollected = _haliteInCellOldValue / Constants.ExtractRatio;
-            if (_ship.Halite + haliteCollected > Constants.MaxHalite)
-            {
-                haliteCollected = Math.Max(0, Constants.MaxHalite - _ship.Halite);
-            }
-            _ship.Halite += haliteCollected;
-            map.ChangeHaliteAt(_ship, -haliteCollected);
+            _ship.Halite += _haliteCollected;
+            game.GameMap.ChangeHaliteAt(_ship, -_haliteCollected);
         }
 
         public void Undo(Game game)
         {
-            game.GameMap.SetHaliteAt(_ship, _haliteInCellOldValue);
-            _ship.Halite = _haliteOnShipOldValue;
+            _ship.Halite -= _haliteCollected;
+            game.GameMap.SetHaliteAt(_ship, _haliteCollected);
         }
     }
 }
