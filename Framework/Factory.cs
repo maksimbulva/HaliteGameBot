@@ -1,6 +1,6 @@
 ﻿namespace HaliteGameBot.Framework
 {
-    static class Factory
+    internal static class Factory
     {
         private static readonly Commands.SpawnShip _spawnShipCommand = new Commands.SpawnShip();
 

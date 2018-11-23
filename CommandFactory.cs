@@ -5,7 +5,7 @@ using System;
 
 namespace HaliteGameBot
 {
-    static class CommandFactory
+    internal static class CommandFactory
     {
         public static ICommand FromAction(IGameAction gameAction, int entityId)
         {
@@ -13,16 +13,14 @@ namespace HaliteGameBot
             {
                 return new Move(entityId, Direction.STAY_STILL);
             }
-            var moveXAction = gameAction as MoveX;
-            if (moveXAction != null)
+            if (gameAction is MoveX moveXAction)
             {
                 Direction direction = moveXAction.DeltaX == -1 || moveXAction.DeltaX > 1
                     ? Direction.WEST
                     : Direction.EAST;
                 return new Move(entityId, direction);
             }
-            var moveYAction = gameAction as MoveY;
-            if (moveYAction != null)
+            if (gameAction is MoveY moveYAction)
             {
                 Direction direction = moveYAction.DeltaY == -1 || moveYAction.DeltaY > 2
                     ? Direction.NORTH

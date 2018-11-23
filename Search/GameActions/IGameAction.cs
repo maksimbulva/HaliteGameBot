@@ -1,10 +1,8 @@
-﻿using HaliteGameBot.Framework;
-
-namespace HaliteGameBot.Search.GameActions
+﻿namespace HaliteGameBot.Search.GameActions
 {
-    interface IGameAction
+    internal interface IGameAction
     {
-        void Play(Game game);
-        void Undo(Game game);
+        void Play(GameMapState gameMapState);
+        void Undo(GameMapState gameMapState);
     }
 }

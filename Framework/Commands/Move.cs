@@ -1,6 +1,6 @@
 ﻿namespace HaliteGameBot.Framework.Commands
 {
-    class Move : ICommand
+    internal sealed class Move : ICommand
     {
         public int EntityId { get; }
         public Direction Direction { get; }

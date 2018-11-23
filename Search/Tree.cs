@@ -2,7 +2,7 @@
 
 namespace HaliteGameBot.Search
 {
-    class Tree
+    internal sealed class Tree
     {
         private const int ROOT_DEPTH = 0;
 

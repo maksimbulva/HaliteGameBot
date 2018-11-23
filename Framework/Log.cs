@@ -3,7 +3,7 @@ using System.IO;
 
 namespace HaliteGameBot.Framework
 {
-    static class Log
+    internal static class Log
     {
         private static readonly List<string> _messageQueue = new List<string>();
         private static string _filename;

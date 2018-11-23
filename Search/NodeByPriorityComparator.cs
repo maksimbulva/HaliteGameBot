@@ -2,7 +2,7 @@
 
 namespace HaliteGameBot.Search
 {
-    class NodeByPriorityComparator : IComparer<Node>
+    internal sealed class NodeByPriorityComparator : IComparer<Node>
     {
         public static NodeByPriorityComparator Instance { get; } = new NodeByPriorityComparator();
 

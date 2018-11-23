@@ -2,7 +2,7 @@
 
 namespace HaliteGameBot.Search
 {
-    interface ISearchStats
+    internal interface ISearchStats
     {
         int ThreadId { get; }
         long ActionCount { get; }

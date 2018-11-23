@@ -1,6 +1,6 @@
 ﻿namespace HaliteGameBot.Framework.Commands
 {
-    class BuildDropoffSite : ICommand
+    internal sealed class BuildDropoffSite : ICommand
     {
         public int EntityId { get; }
 

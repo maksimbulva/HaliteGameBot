@@ -2,7 +2,7 @@
 
 namespace HaliteGameBot.Search
 {
-    sealed class PriorityQueue
+    internal sealed class PriorityQueue
     {
         private readonly C5.IntervalHeap<Node> _priorityQueue;
 

@@ -1,6 +1,6 @@
 ﻿namespace HaliteGameBot.Framework
 {
-    class Shipyard : Entity
+    internal sealed class Shipyard : Entity
     {
         public const int ENTITY_ID = -1;
 

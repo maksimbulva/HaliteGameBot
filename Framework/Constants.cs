@@ -8,7 +8,7 @@ namespace HaliteGameBot.Framework
     /// They come from game engine and changing them has no effect.
     /// They are strictly informational.
     /// </summary>
-    static class Constants
+    internal static class Constants
     {
         // The cost to build a single ship.
         public static int ShipCost { get; private set; }

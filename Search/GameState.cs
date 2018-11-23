@@ -6,24 +6,24 @@ namespace HaliteGameBot.Search
 {
     class GameState
     {
-        private readonly Game _game;
+        private readonly GameMapState _gameMapState;
         private readonly Stack<IGameAction> _actions = new Stack<IGameAction>(32);
 
-        public GameState(Game game)
+        public GameState(GameMapState gameMapState)
         {
-            _game = game;
+            _gameMapState = gameMapState;
         }
 
         public void Play(IGameAction action)
         {
             _actions.Push(action);
-            action.Play(_game);
+            action.Play(_gameMapState);
         }
 
         public void Undo()
         {
             IGameAction action = _actions.Pop();
-            action.Undo(_game);
+            action.Undo(_gameMapState);
         }
 
         public void UndoAll()
@@ -39,28 +39,28 @@ namespace HaliteGameBot.Search
         {
             List<IGameAction> results = new List<IGameAction>(8)
             {
-                new StayStill(_game, ship)
+                new StayStill(_gameMapState, ship)
             };
 
-            var moveUp = new MoveY(_game, ship, MoveY.MoveDir.UP);
+            var moveUp = new MoveY(_gameMapState, ship, MoveY.MoveDir.NORTH);
             if (moveUp.MoveCost <= ship.Halite)
             {
                 results.Add(moveUp);
             }
 
-            var moveDown = new MoveY(_game, ship, MoveY.MoveDir.DOWN);
+            var moveDown = new MoveY(_gameMapState, ship, MoveY.MoveDir.SOUTH);
             if (moveDown.MoveCost <= ship.Halite)
             {
                 results.Add(moveDown);
             }
 
-            var moveLeft = new MoveX(_game, ship, MoveX.MoveDir.LEFT);
+            var moveLeft = new MoveX(_gameMapState, ship, MoveX.MoveDir.LEFT);
             if (moveLeft.MoveCost <= ship.Halite)
             {
                 results.Add(moveLeft);
             }
 
-            var moveRight = new MoveX(_game, ship, MoveX.MoveDir.RIGHT);
+            var moveRight = new MoveX(_gameMapState, ship, MoveX.MoveDir.RIGHT);
             if (moveRight.MoveCost <= ship.Halite)
             {
                 results.Add(moveRight);

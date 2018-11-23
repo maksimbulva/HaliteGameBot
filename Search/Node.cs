@@ -1,13 +1,9 @@
 ﻿using HaliteGameBot.Search.GameActions;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HaliteGameBot.Search
 {
-    class Node
+    internal sealed class Node
     {
         public Node Parent { get; }
         public IGameAction GameAction { get; }

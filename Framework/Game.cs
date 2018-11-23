@@ -2,7 +2,7 @@
 
 namespace HaliteGameBot.Framework
 {
-    class Game
+    internal sealed class Game
     {
         public int TurnNumber { get; private set; }
 

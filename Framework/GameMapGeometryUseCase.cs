@@ -1,6 +1,6 @@
 ﻿namespace HaliteGameBot.Framework
 {
-    static class GameMapGeometryUseCase
+    internal static class GameMapGeometryUseCase
     {
         public static int IncCoord(int c, int maxCoord) => ++c < maxCoord ? c : c - maxCoord;
 

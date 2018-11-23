@@ -1,6 +1,6 @@
 ﻿namespace HaliteGameBot.Framework
 {
-    enum Direction
+    internal enum Direction
     {
         NORTH,
         EAST,

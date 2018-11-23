@@ -4,10 +4,12 @@ using HaliteGameBot.Search.GameActions;
 
 namespace HaliteGameBot.Search
 {
-    class Search
+    internal sealed class Search
     {
-        private readonly Game _game;
+        private readonly GameMapState _gameMapState;
+
         private readonly Strategy _strategy;
+
         private readonly Tree _tree;
         private readonly PriorityQueue _priorityQueue;
 
@@ -18,7 +20,8 @@ namespace HaliteGameBot.Search
 
         public Search(Game game, Strategy strategy, int queueCapacity)
         {
-            _game = game;
+            _gameMapState = new GameMapState(game);
+
             _strategy = strategy;
             _tree = new Tree(game);
             _priorityQueue = new PriorityQueue(queueCapacity);
@@ -37,7 +40,7 @@ namespace HaliteGameBot.Search
         {
             _stats = new SearchStats();
 
-            Evaluate(new GameState(_game), _tree.Root);
+            Evaluate(new GameState(_gameMapState), _tree.Root);
             _priorityQueue.Enqueue(_tree.Root);
 
             // TODO - for the moment, limit the number of nodes to 100
@@ -69,7 +72,7 @@ namespace HaliteGameBot.Search
                 return;
             }
 
-            GameState gameState = new GameState(_game);
+            GameState gameState = new GameState(_gameMapState);
             node.GetParents(_parentsBuffer);
 
             // Play node actions from root to the given node

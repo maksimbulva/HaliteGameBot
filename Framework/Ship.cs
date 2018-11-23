@@ -1,6 +1,6 @@
 ﻿namespace HaliteGameBot.Framework
 {
-    class Ship : Entity
+    internal sealed class Ship : Entity
     {
         public int Halite { get; set; }
 

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 using HaliteGameBot.Framework;
 using HaliteGameBot.Framework.Commands;
@@ -8,7 +7,7 @@ using HaliteGameBot.Search.GameActions;
 
 namespace HaliteGameBot
 {
-    class MyBot
+    internal sealed class MyBot
     {
         private readonly Game _game;
         private readonly Strategy _strategy;

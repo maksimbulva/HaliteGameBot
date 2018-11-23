@@ -2,7 +2,7 @@
 
 namespace HaliteGameBot.Framework
 {
-    static class DirectionUseCase
+    internal static class DirectionUseCase
     {
         public static readonly Direction[] AllCardinals = new Direction[4]
         {

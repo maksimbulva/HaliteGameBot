@@ -1,9 +1,8 @@
 ﻿using HaliteGameBot.Framework;
-using System;
 
 namespace HaliteGameBot
 {
-    static class GameMechanicsHelper
+    internal static class GameMechanicsHelper
     {
         static private double InvExtractRatio;
 

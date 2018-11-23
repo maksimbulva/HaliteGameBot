@@ -4,7 +4,7 @@ using HaliteGameBot.Framework;
 
 namespace HaliteGameBot
 {
-    class Program
+    internal class Program
     {
         static void Main(string[] args)
         {

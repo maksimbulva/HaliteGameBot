@@ -4,12 +4,12 @@ using System.Linq;
 
 namespace HaliteGameBot.Framework
 {
-    class GameMap
+    internal sealed class GameMap
     {
         public int Width { get; }
         public int Height { get; }
 
-        public List<int> Halite { get; }
+        public int[] Halite { get; }
         public List<bool> Occupied { get; }
 
         public static GameMap CreateFromInput()
@@ -41,8 +41,13 @@ namespace HaliteGameBot.Framework
             Height = height;
 
             int mapCellCount = width * height;
-            Halite = new List<int>(mapCellCount);
-            Halite.AddRange(Enumerable.Repeat(0, mapCellCount));
+            if (mapCellCount * sizeof(int) > 85000)
+            {
+                throw new Exception("The map halite array is too big, use List<T> instead");
+            }
+
+            Halite = new int[mapCellCount];
+
             Occupied = new List<bool>(mapCellCount);
             Occupied.AddRange(Enumerable.Repeat(false, mapCellCount));
         }

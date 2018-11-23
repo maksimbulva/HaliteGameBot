@@ -3,17 +3,16 @@ using System;
 
 namespace HaliteGameBot.Search.GameActions
 {
-    sealed class StayStill : IGameAction
+    internal sealed class StayStill : IGameAction
     {
         private readonly Ship _ship;
         private readonly int _haliteCollected;
 
-        public StayStill(Game game, Ship ship)
+        public StayStill(GameMapState gameMapState, Ship ship)
         {
             _ship = ship;
 
-            GameMap map = game.GameMap;
-            int haliteInCellOldValue = map.GetHaliteAt(_ship);
+            int haliteInCellOldValue = gameMapState.GetHaliteAt(_ship);
 
             int haliteInCellNewValue = Math.Min(
                 _ship.Halite + GameMechanicsHelper.HaliteToCollect(haliteInCellOldValue),
@@ -22,16 +21,16 @@ namespace HaliteGameBot.Search.GameActions
             _haliteCollected = haliteInCellNewValue - _ship.Halite;
         }
 
-        public void Play(Game game)
+        public void Play(GameMapState gameMapState)
         {
             _ship.Halite += _haliteCollected;
-            game.GameMap.ChangeHaliteAt(_ship, -_haliteCollected);
+            gameMapState.ChangeHaliteAt(_ship, -_haliteCollected);
         }
 
-        public void Undo(Game game)
+        public void Undo(GameMapState gameMapState)
         {
             _ship.Halite -= _haliteCollected;
-            game.GameMap.SetHaliteAt(_ship, _haliteCollected);
+            gameMapState.ChangeHaliteAt(_ship, _haliteCollected);
         }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace HaliteGameBot.Framework
 {
-    class InputReader
+    internal sealed class InputReader
     {
         private static readonly char[] separator = new char[] { ' ' };
 

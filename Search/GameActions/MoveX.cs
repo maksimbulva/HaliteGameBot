@@ -2,7 +2,7 @@
 
 namespace HaliteGameBot.Search.GameActions
 {
-    sealed class MoveX : IGameAction
+    internal sealed class MoveX : IGameAction
     {
         public enum MoveDir
         {
@@ -18,27 +18,24 @@ namespace HaliteGameBot.Search.GameActions
 
         public int DeltaX => _newX - _oldX;
 
-        public MoveX(Game game, Ship ship, MoveDir moveDir)
+        public MoveX(GameMapState gameMapState, Ship ship, MoveDir moveDir)
         {
             _ship = ship;
 
-            GameMap map = game.GameMap;
             _oldX = _ship.Position.Y;
-            _newX = moveDir == MoveDir.LEFT
-                ? GameMapGeometryUseCase.DecCoord(_oldX, map.Width)
-                : GameMapGeometryUseCase.IncCoord(_oldX, map.Width);
+            _newX = moveDir == MoveDir.LEFT ? gameMapState.ToLeftOf(_oldX) : gameMapState.ToRightOf(_oldX);
 
-            int haliteAtDestCell = map.Halite[map.GetIndex(_newX, _ship.Position.Y)];
+            int haliteAtDestCell = gameMapState.GetHaliteAt(_newX, _ship.Position.Y);
             MoveCost = GameMechanicsHelper.HaliteToMoveCost(haliteAtDestCell);
         }
 
-        public void Play(Game game)
+        public void Play(GameMapState gameMapState)
         {
             _ship.Position = new Position(_newX, _ship.Position.Y);
             _ship.Halite -= MoveCost;
         }
 
-        public void Undo(Game game)
+        public void Undo(GameMapState gameMapState)
         {
             _ship.Position = new Position(_oldX, _ship.Position.Y);
             _ship.Halite += MoveCost;

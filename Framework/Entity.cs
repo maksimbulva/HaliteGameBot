@@ -1,6 +1,6 @@
 ﻿namespace HaliteGameBot.Framework
 {
-    abstract class Entity
+    internal abstract class Entity
     {
         protected Entity(int playerId, int entityId, Position position)
         {

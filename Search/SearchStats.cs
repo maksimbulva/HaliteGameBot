@@ -3,7 +3,7 @@ using System.Threading;
 
 namespace HaliteGameBot.Search
 {
-    sealed class SearchStats : ISearchStats
+    internal sealed class SearchStats : ISearchStats
     {
         public int ThreadId { get; set; }
         public long ActionCount { get; set; }
