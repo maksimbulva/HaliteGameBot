@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using HaliteGameBot.Framework;
 using HaliteGameBot.Search.GameActions;
 
@@ -30,21 +31,21 @@ namespace HaliteGameBot.Search
         public void Clear()
         {
             _tree.Clear();
-            while (!_priorityQueue.IsEmpty)
-            {
-                _priorityQueue.Dequeue();
-            }
+            _priorityQueue.Clear();
         }
 
         public void Run(Ship ship)
         {
-            _stats = new SearchStats();
+            if (!_priorityQueue.IsEmpty)
+            {
+                throw new Exception("Call Clear() before calling new Run()");
+            }
 
-            Evaluate(new GameState(_gameMapState), _tree.Root);
+            _stats = new SearchStats();
             _priorityQueue.Enqueue(_tree.Root);
 
             // TODO - for the moment, limit the number of nodes to 100
-            for (int i = 0; i < 100; ++i)
+            for (int i = 0; i < 100 && !_priorityQueue.IsEmpty; ++i)
             {
                 ProcessNode(_priorityQueue.Dequeue(), ship, _strategy);
             }
@@ -67,11 +68,6 @@ namespace HaliteGameBot.Search
 
         private void ProcessNode(Node node, Ship ship, Strategy strategy)
         {
-            if (node == null)
-            {
-                return;
-            }
-
             GameState gameState = new GameState(_gameMapState);
             node.GetParents(_parentsBuffer);
 
@@ -85,10 +81,6 @@ namespace HaliteGameBot.Search
                 }
             }
 
-            int childDepth = node.Depth + 1;
-            List<Node> children = null;
-
-            double maxChildrenEvaluation = double.MinValue;
             List<IGameAction> actions = gameState.GenerateActions(ship);
             _stats.ActionCount += actions.Count;
 
@@ -97,40 +89,19 @@ namespace HaliteGameBot.Search
                 gameState.Play(action);
 
                 double evaluation = _strategy.EvaluateStatic(gameState);
-                if (evaluation > maxChildrenEvaluation)
-                {
-                    maxChildrenEvaluation = evaluation;
-                }
+                double priority = _strategy.GetPriority(evaluation, node.Depth + 1);
 
-                double priority = _strategy.GetPriority(evaluation, childDepth);
                 if (_priorityQueue.WillEnqueue(priority))
                 {
-                    Node child = new Node(node, action, childDepth);
                     ++_stats.NodeCount;
-                    if (children == null)
-                    {
-                        children = new List<Node>(5);
-                    }
-                    children.Add(child);
+                    Node child = node.AddChild(action, priority, evaluation);
                     _priorityQueue.Enqueue(child);
                 }
 
                 gameState.Undo();
             }
 
-            node.Children = children;
-
-            if (maxChildrenEvaluation > node.Evaluation)
-            {
-                node.Evaluation = maxChildrenEvaluation;
-                _tree.PropagadeEvaluationChange(node);
-            }
-        }
-
-        private void Evaluate(GameState gameState, Node node)
-        {
-            node.Evaluation = _strategy.EvaluateStatic(gameState);
-            node.Priority = _strategy.GetPriority(node.Evaluation, node.Depth);
+            _tree.SetEvaluation(node, node.BestChildEvaluation);
         }
 
         // private double GetPriority(Node node) => _strategy.GetPriority(node.Evaluation, node.Depth);

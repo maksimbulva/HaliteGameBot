@@ -8,26 +8,30 @@ namespace HaliteGameBot.Search
 
         private readonly Game _game;
 
-        public Node Root { get; }
+        public Node Root { get; } = new Node(null, null, ROOT_DEPTH);
 
         public Tree(Game game)
         {
             _game = game;
-            Root = new Node(null, null, ROOT_DEPTH);
         }
 
         public void Clear()
         {
             // TODO: consider using memory pooling
-            if (Root.Children != null)
-            {
-                Root.Children.Clear();
-                Root.Children = null;
-            }
+            Root.Reuse(null, null, ROOT_DEPTH);
         }
 
-        public void PropagadeEvaluationChange(Node sourse)
+        public void SetEvaluation(Node node, double evaluation)
         {
+            node.Evaluation = evaluation;
+            while (node.Parent != null)
+            {
+                if (!node.Parent.OnChildEvaluated(node, node.Evaluation)) 
+                {
+                    break;
+                }
+                node = node.Parent;
+            }
         }
 
         /*
