@@ -19,6 +19,8 @@ namespace HaliteGameBot.Search
         private SearchStats _stats;
         public ISearchStats Stats { get => _stats; }
 
+        public SearchResults Results { get; private set; }
+
         public Search(Game game, Strategy strategy, int queueCapacity)
         {
             _gameMapState = new GameMapState(game);
@@ -32,6 +34,7 @@ namespace HaliteGameBot.Search
         {
             _tree.Clear();
             _priorityQueue.Clear();
+            Results = null;
         }
 
         public void Run(Ship ship)
@@ -51,6 +54,7 @@ namespace HaliteGameBot.Search
             }
 
             _stats.OnSearchFinished();
+            Results = new SearchResults(_tree.Root.Children);
         }
 
         public IGameAction GetBestAction()
