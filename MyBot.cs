@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 using HaliteGameBot.Framework;
 using HaliteGameBot.Framework.Commands;
@@ -50,7 +51,7 @@ namespace HaliteGameBot
 
             if (_game.TurnNumber <= 200
                 && myPlayer.Halite >= Constants.ShipCost
-                && !gameMap.Occupied[gameMap.GetIndex(myPlayer.Shipyard.Position)])
+                && !myPlayer.Ships.Exists(ship => ship.Position.Equals(myPlayer.Shipyard.Position)))
             {
                 commands.Add(Factory.CreateSpawnShipCommand());
             }

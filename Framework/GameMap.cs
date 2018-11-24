@@ -10,8 +10,7 @@ namespace HaliteGameBot.Framework
         public int Height { get; }
 
         public int[] Halite { get; }
-        public List<bool> Occupied { get; }
-
+        
         public static GameMap CreateFromInput()
         {
             var reader = new InputReader();
@@ -47,9 +46,6 @@ namespace HaliteGameBot.Framework
             }
 
             Halite = new int[mapCellCount];
-
-            Occupied = new List<bool>(mapCellCount);
-            Occupied.AddRange(Enumerable.Repeat(false, mapCellCount));
         }
 
         public void UpdateFromInput()

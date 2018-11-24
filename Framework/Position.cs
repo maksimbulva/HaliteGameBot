@@ -10,5 +10,10 @@
             X = x;
             Y = y;
         }
+
+        public bool Equals(Position other)
+        {
+            return X == other.X && Y == other.Y;
+        }
     }
 }

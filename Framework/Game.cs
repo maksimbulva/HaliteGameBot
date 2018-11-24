@@ -33,8 +33,6 @@ namespace HaliteGameBot.Framework
 
             Log.Write($"=============== TURN {TurnNumber} ================");
 
-            SetMapCellsOccupiedStatus(false);
-
             for (int i = 0; i < Players.Count; ++i)
             {
                 var playerReader = new InputReader();
@@ -46,8 +44,6 @@ namespace HaliteGameBot.Framework
             }
 
             GameMap.UpdateFromInput();
-
-            SetMapCellsOccupiedStatus(true);
 
             UpdateMyShipsDict();
 
@@ -79,14 +75,6 @@ namespace HaliteGameBot.Framework
             }
 
             MyPlayer = Players[myPlayerId];
-        }
-
-        private void SetMapCellsOccupiedStatus(bool status)
-        {
-            foreach (Player player in Players)
-            {
-                player.Ships.ForEach(ship => GameMap.Occupied[GameMap.GetIndex(ship.Position)] = status);
-            }
         }
 
         private void UpdateMyShipsDict()
