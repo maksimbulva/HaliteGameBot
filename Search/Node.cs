@@ -1,6 +1,5 @@
 ﻿using HaliteGameBot.Search.GameActions;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace HaliteGameBot.Search
 {
@@ -51,9 +50,11 @@ namespace HaliteGameBot.Search
                 // TODO - use memory pool
                 Children = new List<Node>(6);
             }
-            Node child = new Node(this, gameAction, Depth + 1);
-            child.Priority = priority;
-            child.Evaluation = evaluation;
+            Node child = new Node(this, gameAction, Depth + 1)
+            {
+                Priority = priority,
+                Evaluation = evaluation
+            };
             Children.Add(child);
             OnChildEvaluated(child, evaluation);
             return child;

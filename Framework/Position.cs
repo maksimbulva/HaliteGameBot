@@ -15,5 +15,7 @@
         {
             return X == other.X && Y == other.Y;
         }
+
+        public override string ToString() => $"{X}, {Y}";
     }
 }

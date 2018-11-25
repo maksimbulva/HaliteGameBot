@@ -1,19 +1,10 @@
-﻿using HaliteGameBot.Framework;
-
-namespace HaliteGameBot.Search
+﻿namespace HaliteGameBot.Search
 {
     internal sealed class Tree
     {
         private const int ROOT_DEPTH = 0;
 
-        private readonly Game _game;
-
         public Node Root { get; } = new Node(null, null, ROOT_DEPTH);
-
-        public Tree(Game game)
-        {
-            _game = game;
-        }
 
         public void Clear()
         {

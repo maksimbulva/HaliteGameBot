@@ -11,7 +11,7 @@ namespace HaliteGameBot.Search
 
         private readonly Strategy _strategy;
 
-        private readonly Tree _tree;
+        private readonly Tree _tree = new Tree();
         private readonly PriorityQueue _priorityQueue;
 
         private readonly List<Node> _parentsBuffer = new List<Node>(32);
@@ -21,12 +21,13 @@ namespace HaliteGameBot.Search
 
         public SearchResults Results { get; private set; }
 
+        public double BestEvaluation => _tree.Root.Evaluation;
+
         public Search(Game game, Strategy strategy, int queueCapacity)
         {
             _gameMapState = new GameMapState(game);
 
             _strategy = strategy;
-            _tree = new Tree(game);
             _priorityQueue = new PriorityQueue(queueCapacity);
         }
 
@@ -37,7 +38,13 @@ namespace HaliteGameBot.Search
             Results = null;
         }
 
-        public void Run(Ship ship)
+        public void UpdateMap(IEnumerable<GameMapUpdate> mapUpdates, HashSet<int> dropoffs)
+        {
+            _gameMapState.ApplyUpdates(mapUpdates);
+            _gameMapState.Dropoffs = dropoffs;
+        }
+
+        public void Run(Game game, Ship ship)
         {
             if (!_priorityQueue.IsEmpty)
             {
@@ -50,29 +57,18 @@ namespace HaliteGameBot.Search
             // TODO - for the moment, limit the number of nodes to 100
             for (int i = 0; i < 100 && !_priorityQueue.IsEmpty; ++i)
             {
-                ProcessNode(_priorityQueue.Dequeue(), ship, _strategy);
+                ProcessNode(_priorityQueue.Dequeue(), ship, game, _strategy);
             }
 
             _stats.OnSearchFinished();
-            Results = new SearchResults(_tree.Root.Children);
+            Results = new SearchResults(ship, _tree.Root.Children);
+
+            Log.Write("Search run finished");
         }
 
-        public IGameAction GetBestAction()
+        private void ProcessNode(Node node, Ship ship, Game game, Strategy strategy)
         {
-            Node bestChild = null;
-            _tree.Root?.Children.ForEach(node =>
-            {
-                if (bestChild == null || node.Evaluation > bestChild.Evaluation)
-                {
-                    bestChild = node;
-                }
-            });
-            return bestChild.GameAction;
-        }
-
-        private void ProcessNode(Node node, Ship ship, Strategy strategy)
-        {
-            GameState gameState = new GameState(_gameMapState);
+            GameState gameState = new GameState(new PlayerState(game.MyPlayer.Halite), _gameMapState);
             node.GetParents(_parentsBuffer);
 
             // Play node actions from root to the given node
@@ -106,8 +102,7 @@ namespace HaliteGameBot.Search
             }
 
             _tree.SetEvaluation(node, node.BestChildEvaluation);
+            gameState.UndoAll();
         }
-
-        // private double GetPriority(Node node) => _strategy.GetPriority(node.Evaluation, node.Depth);
     }
 }

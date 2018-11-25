@@ -1,5 +1,6 @@
 ﻿using HaliteGameBot.Framework;
 using System;
+using System.Collections.Generic;
 
 namespace HaliteGameBot.Search
 {
@@ -9,6 +10,8 @@ namespace HaliteGameBot.Search
         public int Height { get; }
 
         public int[] Halite { get; }
+
+        public HashSet<int> Dropoffs;
 
         public GameMapState(Game game)
         {
@@ -41,5 +44,15 @@ namespace HaliteGameBot.Search
             int halite = Halite[index];
             Halite[index] = Math.Max(0, halite + diff);
         }
+
+        public void ApplyUpdates(IEnumerable<GameMapUpdate> mapUpdates)
+        {
+            foreach (GameMapUpdate update in mapUpdates)
+            {
+                Halite[update.CellIndex] = update.Halite;
+            }
+        }
+
+        public bool IsDropoffAt(Ship ship) => Dropoffs.Contains(ship.Position.X + ship.Position.Y * Width);
     }
 }

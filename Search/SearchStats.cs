@@ -20,5 +20,10 @@ namespace HaliteGameBot.Search
         }
 
         public void OnSearchFinished() => FinishTime = DateTime.Now;
+
+        public override string ToString()
+        {
+            return $"[{ThreadId}] {(int)Duration.TotalMilliseconds}ms {ActionCount} actions, {NodeCount} nodes";
+        }
     }
 }

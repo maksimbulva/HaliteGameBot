@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace HaliteGameBot.Framework
 {
@@ -39,25 +38,14 @@ namespace HaliteGameBot.Framework
             Width = width;
             Height = height;
 
-            int mapCellCount = width * height;
-            if (mapCellCount * sizeof(int) > 85000)
-            {
-                throw new Exception("The map halite array is too big, use List<T> instead");
-            }
-
-            Halite = new int[mapCellCount];
+            Halite = new int[width * height];
         }
 
-        public void UpdateFromInput()
+        public void Update(IEnumerable<GameMapUpdate> mapUpdates)
         {
-            var reader = new InputReader();
-            for (int updateCount = reader.NextInt(); updateCount > 0; --updateCount)
+            foreach (GameMapUpdate update in mapUpdates)
             {
-                var updateReader = new InputReader();
-                int x = updateReader.NextInt();
-                int y = updateReader.NextInt();
-                int halite = updateReader.NextInt();
-                Halite[GetIndex(x, y)] = halite;
+                Halite[update.CellIndex] = update.Halite;
             }
         }
 

@@ -38,6 +38,7 @@ namespace HaliteGameBot.Search
             {
                 _priorityQueue.DeleteMin();
             }
+            Count = 0;
         }
 
         public Node Dequeue()

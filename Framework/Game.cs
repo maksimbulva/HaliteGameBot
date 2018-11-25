@@ -13,6 +13,9 @@ namespace HaliteGameBot.Framework
 
         public Dictionary<int, Ship> MyShips { get; }
 
+        private readonly List<GameMapUpdate> _mapUpdates = new List<GameMapUpdate>(128);
+        public IEnumerable<GameMapUpdate> MapUpdates { get => _mapUpdates; }
+
         public static Game CreateFromInput()
         {
             Game game = new Game();
@@ -23,7 +26,7 @@ namespace HaliteGameBot.Framework
 
         private Game()
         {
-            MyShips = new Dictionary<int, Ship>(16);
+            MyShips = new Dictionary<int, Ship>(32);
         }
 
         public void ReadFrameUpdate()
@@ -43,7 +46,8 @@ namespace HaliteGameBot.Framework
                 Players[id].UpdateFromInput(shipCount, dropoffCount, halite);
             }
 
-            GameMap.UpdateFromInput();
+            ReadMapUpdatesFromInput();
+            GameMap.Update(_mapUpdates);
 
             UpdateMyShipsDict();
 
@@ -59,6 +63,20 @@ namespace HaliteGameBot.Framework
                     // }
                 // }
             // }
+        }
+
+        private void ReadMapUpdatesFromInput()
+        {
+            var reader = new InputReader();
+            for (int updateCount = reader.NextInt(); updateCount > 0; --updateCount)
+            {
+                _mapUpdates.Clear();
+                var updateReader = new InputReader();
+                int x = updateReader.NextInt();
+                int y = updateReader.NextInt();
+                int halite = updateReader.NextInt();
+                _mapUpdates.Add(new GameMapUpdate(GameMap.GetIndex(x, y), halite));
+            }
         }
 
         private void ReadPlayersFromInput()

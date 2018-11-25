@@ -4,26 +4,28 @@ using HaliteGameBot.Search.GameActions;
 
 namespace HaliteGameBot.Search
 {
-    class GameState
+    internal sealed class GameState
     {
+        private readonly PlayerState _playerState;
         private readonly GameMapState _gameMapState;
         private readonly Stack<IGameAction> _actions = new Stack<IGameAction>(32);
 
-        public GameState(GameMapState gameMapState)
+        public GameState(PlayerState playerState, GameMapState gameMapState)
         {
+            _playerState = playerState;
             _gameMapState = gameMapState;
         }
 
         public void Play(IGameAction action)
         {
             _actions.Push(action);
-            action.Play(_gameMapState);
+            action.Play(_playerState, _gameMapState);
         }
 
         public void Undo()
         {
             IGameAction action = _actions.Pop();
-            action.Undo(_gameMapState);
+            action.Undo(_playerState, _gameMapState);
         }
 
         public void UndoAll()
@@ -43,25 +45,25 @@ namespace HaliteGameBot.Search
             };
 
             var moveUp = new MoveY(_gameMapState, ship, MoveY.MoveDir.NORTH);
-            if (moveUp.MoveCost <= ship.Halite)
+            if (moveUp.MoveCost <= _playerState.Halite)
             {
                 results.Add(moveUp);
             }
 
             var moveDown = new MoveY(_gameMapState, ship, MoveY.MoveDir.SOUTH);
-            if (moveDown.MoveCost <= ship.Halite)
+            if (moveDown.MoveCost <= _playerState.Halite)
             {
                 results.Add(moveDown);
             }
 
             var moveLeft = new MoveX(_gameMapState, ship, MoveX.MoveDir.LEFT);
-            if (moveLeft.MoveCost <= ship.Halite)
+            if (moveLeft.MoveCost <= _playerState.Halite)
             {
                 results.Add(moveLeft);
             }
 
             var moveRight = new MoveX(_gameMapState, ship, MoveX.MoveDir.RIGHT);
-            if (moveRight.MoveCost <= ship.Halite)
+            if (moveRight.MoveCost <= _playerState.Halite)
             {
                 results.Add(moveRight);
             }

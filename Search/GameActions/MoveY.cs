@@ -2,7 +2,7 @@
 
 namespace HaliteGameBot.Search.GameActions
 {
-    internal sealed class MoveY : IGameAction
+    internal sealed class MoveY : BaseShipAction
     {
         public enum MoveDir
         {
@@ -10,7 +10,6 @@ namespace HaliteGameBot.Search.GameActions
             SOUTH
         }
 
-        private readonly Ship _ship;
         private readonly int _oldY;
         private readonly int _newY;
 
@@ -18,27 +17,31 @@ namespace HaliteGameBot.Search.GameActions
 
         public int DeltaY => _newY - _oldY;
 
-        public MoveY(GameMapState _gameMapState, Ship ship, MoveDir moveDir)
+        public override Position Destination => new Position(_ship.Position.X, _newY);
+
+        public MoveY(GameMapState gameMapState, Ship ship, MoveDir moveDir) : base(ship)
         {
-            _ship = ship;
-
             _oldY = _ship.Position.Y;
-            _newY = moveDir == MoveDir.NORTH ? _gameMapState.ToNorthOf(_oldY) : _gameMapState.ToSouthOf(_oldY);
+            _newY = moveDir == MoveDir.NORTH ? gameMapState.ToNorthOf(_oldY) : gameMapState.ToSouthOf(_oldY);
 
-            int haliteAtDestCell = _gameMapState.GetHaliteAt(_ship.Position.X, _newY);
+            int haliteAtDestCell = gameMapState.GetHaliteAt(_ship.Position.X, _newY);
             MoveCost = GameMechanicsHelper.HaliteToMoveCost(haliteAtDestCell);
         }
 
-        public void Play(GameMapState _gameMapState)
+        public override void Play(PlayerState playerState, GameMapState gameMapState)
         {
             _ship.Position = new Position(_ship.Position.X, _newY);
-            _ship.Halite -= MoveCost;
+            playerState.Halite -= MoveCost;
+            TryDropoff(playerState, gameMapState);
         }
 
-        public void Undo(GameMapState _gameMapState)
+        public override void Undo(PlayerState playerState, GameMapState gameMapState)
         {
             _ship.Position = new Position(_ship.Position.X, _oldY);
-            _ship.Halite += MoveCost;
+            playerState.Halite += MoveCost;
+            UndoDropoff(playerState, gameMapState);
         }
+
+        public override string ToString() => DeltaY == -1 || DeltaY > 1 ? "NORTH" : "SOUTH";
     }
 }

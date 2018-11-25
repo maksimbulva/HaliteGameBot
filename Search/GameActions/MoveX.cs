@@ -2,7 +2,7 @@
 
 namespace HaliteGameBot.Search.GameActions
 {
-    internal sealed class MoveX : IGameAction
+    internal sealed class MoveX : BaseShipAction
     {
         public enum MoveDir
         {
@@ -10,7 +10,6 @@ namespace HaliteGameBot.Search.GameActions
             RIGHT
         }
 
-        private readonly Ship _ship;
         private readonly int _oldX;
         private readonly int _newX;
 
@@ -18,10 +17,10 @@ namespace HaliteGameBot.Search.GameActions
 
         public int DeltaX => _newX - _oldX;
 
-        public MoveX(GameMapState gameMapState, Ship ship, MoveDir moveDir)
-        {
-            _ship = ship;
+        public override Position Destination => new Position(_newX, _ship.Position.Y);
 
+        public MoveX(GameMapState gameMapState, Ship ship, MoveDir moveDir) : base(ship)
+        {
             _oldX = _ship.Position.Y;
             _newX = moveDir == MoveDir.LEFT ? gameMapState.ToLeftOf(_oldX) : gameMapState.ToRightOf(_oldX);
 
@@ -29,16 +28,20 @@ namespace HaliteGameBot.Search.GameActions
             MoveCost = GameMechanicsHelper.HaliteToMoveCost(haliteAtDestCell);
         }
 
-        public void Play(GameMapState gameMapState)
+        public override void Play(PlayerState playerState, GameMapState gameMapState)
         {
             _ship.Position = new Position(_newX, _ship.Position.Y);
-            _ship.Halite -= MoveCost;
+            playerState.Halite -= MoveCost;
+            TryDropoff(playerState, gameMapState);
         }
 
-        public void Undo(GameMapState gameMapState)
+        public override void Undo(PlayerState playerState, GameMapState gameMapState)
         {
             _ship.Position = new Position(_oldX, _ship.Position.Y);
-            _ship.Halite += MoveCost;
+            playerState.Halite += MoveCost;
+            UndoDropoff(playerState, gameMapState);
         }
+
+        public override string ToString() => DeltaX == -1 || DeltaX > 1 ? "WEST" : "EAST";
     }
 }

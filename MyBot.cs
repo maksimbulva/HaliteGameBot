@@ -1,10 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
 using HaliteGameBot.Framework;
 using HaliteGameBot.Framework.Commands;
-using HaliteGameBot.Search;
-using HaliteGameBot.Search.GameActions;
 
 namespace HaliteGameBot
 {
@@ -12,13 +9,14 @@ namespace HaliteGameBot
     {
         private readonly Game _game;
         private readonly Strategy _strategy;
-
-        private readonly List<Search.Search> _searches = new List<Search.Search>(16);
+        private readonly SearchManager _searchManager;
+        private readonly List<ICommand> _commandsBuffer = new List<ICommand>(32);
 
         public MyBot(Game game)
         {
             _game = game;
             _strategy = new Strategy();
+            _searchManager = new SearchManager(_game, _strategy);
         }
 
         public void Initialize()
@@ -26,53 +24,34 @@ namespace HaliteGameBot
             // Do precalculations here. We have up to 2 seconds
         }
 
-        public List<ICommand> GenerateTurnCommands()
+        public IEnumerable<ICommand> GenerateTurnCommands()
         {
-            var commands = new List<ICommand>();
-
             Player myPlayer = _game.MyPlayer;
             GameMap gameMap = _game.GameMap;
 
-            // TODO: run all searches in parallel
-            List<Ship> ships = myPlayer.Ships;
-            while (_searches.Count < ships.Count)
-            {
-                _searches.Add(CreateSearch());
-            }
+            Log.Write($"{myPlayer.Ships.Count} ships, {myPlayer.Dropoffs.Count} dropoffs");
 
-            for (int i = 0; i < ships.Count; ++i)
-            {
-                Ship ship = ships[i];
-                Search.Search search = _searches[i];
-                search.Run(ship);
-                IGameAction action = search.GetBestAction();
-                commands.Add(CommandFactory.FromAction(action, ship.EntityId));
-            }
+            _commandsBuffer.Clear();
 
             if (_game.TurnNumber <= 200
                 && myPlayer.Halite >= Constants.ShipCost
                 && !myPlayer.Ships.Exists(ship => ship.Position.Equals(myPlayer.Shipyard.Position)))
             {
-                commands.Add(Factory.CreateSpawnShipCommand());
+                _commandsBuffer.Add(Factory.CreateSpawnShipCommand());
+                Log.Write("Spawn new ship");
             }
 
-            return commands;
+            _searchManager.OnGameUpdated();
+            _searchManager.RunAll();
+            _commandsBuffer.AddRange(_searchManager.CollectCommands());
+
+            return _commandsBuffer;
         }
 
         public void OnMoveCompleted()
         {
-            _searches.ForEach(search => LogSearchStats(search.Stats));
-            _searches.ForEach(search => search.Clear());
-        }
-
-        private Search.Search CreateSearch() => new Search.Search(
-            game: _game,
-            strategy: _strategy,
-            queueCapacity: SearchSettings.QUEUE_CAPACITY);
-
-        private static void LogSearchStats(ISearchStats stats)
-        {
-            Log.Write($"[{stats.ThreadId}] {(int)stats.Duration.TotalMilliseconds}ms {stats.ActionCount} actions, {stats.NodeCount} nodes");
+            _searchManager.LogStats();
+            _searchManager.Clear();
         }
     }
 } 
