@@ -23,6 +23,8 @@ namespace HaliteGameBot.Search
 
         public double BestEvaluation => _tree.Root.Evaluation;
 
+        public bool IsEmpty { get => _tree.Root == null; }
+
         public Search(Game game, Strategy strategy, int queueCapacity)
         {
             _gameMapState = new GameMapState(game);

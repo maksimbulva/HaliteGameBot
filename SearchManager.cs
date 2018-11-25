@@ -75,11 +75,11 @@ namespace HaliteGameBot
 
         public void LogStats()
         {
-            foreach (var search in _searches)
+            _searches.Where(it => !it.IsEmpty).ToList().ForEach(it =>
             {
-                Log.Write(search.Stats.ToString());
-                Log.Write(search.Results.ToString());
-            }
+                Log.Write(it.Stats.ToString());
+                Log.Write(it.Results.ToString());
+            });
         }
 
         private Search.Search CreateSearch() => new Search.Search(
