@@ -29,13 +29,12 @@ namespace HaliteGameBot
             Player myPlayer = _game.MyPlayer;
             GameMap gameMap = _game.GameMap;
 
-            Log.Write($"{myPlayer.Ships.Count} ships, {myPlayer.Dropoffs.Count} dropoffs");
+            Log.Write($"{myPlayer.Halite} halite, {myPlayer.Ships.Count} ships, {myPlayer.Dropoffs.Count} dropoffs");
 
             _commandsBuffer.Clear();
 
             if (_game.TurnNumber <= 200
-                && myPlayer.Halite >= Constants.ShipCost
-                && !myPlayer.Ships.Exists(ship => ship.Position.Equals(myPlayer.Shipyard.Position)))
+                && myPlayer.Halite >= Constants.ShipCost + 1500)
             {
                 _commandsBuffer.Add(Factory.CreateSpawnShipCommand());
                 Log.Write("Spawn new ship");
