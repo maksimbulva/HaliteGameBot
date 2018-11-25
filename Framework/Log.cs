@@ -15,6 +15,7 @@ namespace HaliteGameBot.Framework
             {
                 File.Delete(_filename);
             }
+            FlushMessageQueueToFile();
         }
 
         static public void Write(string message)
