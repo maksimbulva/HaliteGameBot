@@ -27,10 +27,10 @@ namespace HaliteGameBot.Search
             }
         }
 
-        public int ToNorthOf(int y) => --y > 0 ? y : y + Height;
+        public int ToNorthOf(int y) => --y >= 0 ? y : y + Height;
         public int ToSouthOf(int y) => ++y < Height ? y : 0;
 
-        public int ToLeftOf(int x) => --x > 0 ? x : x + Width;
+        public int ToLeftOf(int x) => --x >= 0 ? x : x + Width;
         public int ToRightOf(int x) => ++x < Width ? x : 0;
 
         public int GetCellIndex(int x, int y) => x + y * Width;
