@@ -2,20 +2,19 @@ using System;
 using System.Collections.Generic;
 using HaliteGameBot.Framework;
 using HaliteGameBot.Search;
-using HaliteGameBot.Search.GameActions;
 
 internal sealed class SearchResults
 {
     private readonly Entity _entity;
 
-    public int EntityId { get => _entity.EntityId; }
+    public int EntityId => _entity.EntityId;
 
-    public Position EntityPosition { get => _entity.Position; }
+    public Position EntityPosition => _entity.Position;
 
     // Sorted by evaluation descending
     private List<SearchBranchData> _branches = new List<SearchBranchData>();
 
-    public IReadOnlyList<SearchBranchData> Branches { get => _branches; }
+    public IReadOnlyList<SearchBranchData> Branches => _branches;
 
     public SearchResults(Entity entity, IEnumerable<Node> rootChildren)
     {
@@ -27,7 +26,7 @@ internal sealed class SearchResults
         }
         foreach (Node child in rootChildren)
         {
-            _branches.Add(new SearchBranchData(child.GameAction, child.Priority));
+            _branches.Add(new SearchBranchData(child.GameAction, child.Evaluation));
         }
         _branches.Sort((lhs, rhs) =>
         {
@@ -43,10 +42,10 @@ internal sealed class SearchResults
 
     public class SearchBranchData
     {
-        public IGameAction GameAction { get; }
+        public GameAction GameAction { get; }
         public double Evaluation { get; }
 
-        public SearchBranchData(IGameAction gameAction, double evaluation)
+        public SearchBranchData(GameAction gameAction, double evaluation)
         {
             GameAction = gameAction;
             Evaluation = evaluation;

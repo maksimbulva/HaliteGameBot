@@ -1,30 +1,26 @@
 ﻿using HaliteGameBot.Framework;
 using HaliteGameBot.Framework.Commands;
-using HaliteGameBot.Search.GameActions;
+using HaliteGameBot.Search;
 using System;
 
 namespace HaliteGameBot
 {
     internal static class CommandFactory
     {
-        public static ICommand FromAction(IGameAction gameAction, int entityId)
+        public static ICommand FromGameAction(GameActions gameActionType, int entityId)
         {
-            if (gameAction == null || gameAction is StayStill)
+            switch (gameActionType)
             {
-                return new Move(entityId, Direction.STAY_STILL);
-            }
-            if (gameAction is MoveX moveXAction)
-            {
-                Direction direction = moveXAction.DeltaX == -1 || moveXAction.DeltaX > 1
-                    ? Direction.WEST
-                    : Direction.EAST;
-                return new Move(entityId, direction);
-            }
-            if (gameAction is MoveY moveYAction)
-            {
-                Direction direction = moveYAction.DeltaY == -1 || moveYAction.DeltaY > 2
-                    ? Direction.NORTH
-                    : Direction.SOUTH;
+                case GameActions.STAY_STILL:
+                    return new Move(entityId, Direction.STAY_STILL);
+                case GameActions.MOVE_NORTH:
+                    return new Move(entityId, Direction.NORTH);
+                case GameActions.MOVE_SOUTH:
+                    return new Move(entityId, Direction.SOUTH);
+                case GameActions.MOVE_WEST:
+                    return new Move(entityId, Direction.WEST);
+                case GameActions.MOVE_EAST:
+                    return new Move(entityId, Direction.EAST);
             }
             throw new NotImplementedException();
         }

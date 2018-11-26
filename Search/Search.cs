@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using HaliteGameBot.Framework;
-using HaliteGameBot.Search.GameActions;
 
 namespace HaliteGameBot.Search
 {
@@ -14,16 +13,16 @@ namespace HaliteGameBot.Search
         private readonly Tree _tree = new Tree();
         private readonly PriorityQueue _priorityQueue;
 
-        private readonly List<Node> _parentsBuffer = new List<Node>(32);
+        private readonly Stack<Node> _parentsBuffer = new Stack<Node>(32);
 
         private SearchStats _stats;
-        public ISearchStats Stats { get => _stats; }
+        public ISearchStats Stats => _stats;
 
         public SearchResults Results { get; private set; }
 
         public double BestEvaluation => _tree.Root.Evaluation;
 
-        public bool IsEmpty { get => _tree.Root == null; }
+        public bool IsEmpty => _tree.Root.Children == null || _tree.Root.Children.Count == 0;
 
         public Search(Game game, Strategy strategy, int queueCapacity)
         {
@@ -46,12 +45,14 @@ namespace HaliteGameBot.Search
             _gameMapState.Dropoffs = dropoffs;
         }
 
-        public void Run(Game game, Ship ship)
+        public void Run(Game game, Ship ship, HashSet<int> bannedCells)
         {
             if (!_priorityQueue.IsEmpty)
             {
                 throw new Exception("Call Clear() before calling new Run()");
             }
+
+            _tree.Root.Reuse(null, GameAction.CreateRootAction(game, ship), Tree.ROOT_DEPTH);
 
             _stats = new SearchStats();
             _priorityQueue.Enqueue(_tree.Root);
@@ -59,44 +60,39 @@ namespace HaliteGameBot.Search
             // TODO - for the moment, limit the number of nodes to 100
             for (int i = 0; i < 100 && !_priorityQueue.IsEmpty; ++i)
             {
-                ProcessNode(_priorityQueue.Dequeue(), ship, game, _strategy);
+                ProcessNode(_priorityQueue.Dequeue(), ship, game, _strategy, bannedCells);
             }
 
             _stats.OnSearchFinished();
             Results = new SearchResults(ship, _tree.Root.Children);
-
-            Log.Write("Search run finished");
         }
 
-        private void ProcessNode(Node node, Ship ship, Game game, Strategy strategy)
+        private void ProcessNode(Node node, Ship ship, Game game, Strategy strategy, HashSet<int> bannedCells)
         {
-            GameState gameState = new GameState(new PlayerState(game.MyPlayer.Halite), _gameMapState);
-            node.GetParents(_parentsBuffer);
+            // TODO - creating a new object of this type is expensive
+            GameState gameState = new GameState(_gameMapState);
 
             // Play node actions from root to the given node
-            for (int i = _parentsBuffer.Count - 1; i >= 0; --i)
+            node.FillWithParents(_parentsBuffer);
+            while (_parentsBuffer.Count > 0)
             {
-                IGameAction action = _parentsBuffer[i].GameAction;
-                if (action != null)
-                {
-                    gameState.Play(action);
-                }
+                gameState.Play(_parentsBuffer.Pop().GameAction);
             }
 
-            List<IGameAction> actions = gameState.GenerateActions(ship);
-            _stats.ActionCount += actions.Count;
-
-            foreach (IGameAction action in actions)
+            foreach (GameAction gameAction in gameState.GenerateChildrenActions(node.GameAction))
             {
-                gameState.Play(action);
+                ++_stats.ActionCount;
+
+                gameState.Play(gameAction);
 
                 double evaluation = _strategy.EvaluateStatic(gameState);
                 double priority = _strategy.GetPriority(evaluation, node.Depth + 1);
 
-                if (_priorityQueue.WillEnqueue(priority))
+                if (_priorityQueue.WillEnqueue(priority)
+                    && !(node.IsRoot && IsBanned(gameAction, bannedCells)))
                 {
                     ++_stats.NodeCount;
-                    Node child = node.AddChild(action, priority, evaluation);
+                    Node child = node.AddChild(gameAction, priority, evaluation);
                     _priorityQueue.Enqueue(child);
                 }
 
@@ -105,6 +101,16 @@ namespace HaliteGameBot.Search
 
             _tree.SetEvaluation(node, node.BestChildEvaluation);
             gameState.UndoAll();
+        }
+
+        private bool IsBanned(GameAction gameAction, HashSet<int> bannedCells)
+        {
+            if (bannedCells != null)
+            {
+                int cellIndex = _gameMapState.GetCellIndex(gameAction.Ship.X, gameAction.Ship.Y);
+                return bannedCells.Contains(cellIndex);
+            }
+            return false;
         }
     }
 }

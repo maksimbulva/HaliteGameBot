@@ -34,8 +34,10 @@ namespace HaliteGameBot.Search
         public int ToRightOf(int x) => ++x < Width ? x : 0;
 
         public int GetCellIndex(int x, int y) => x + y * Width;
+        public int GetCellIndex(Position position) => position.X + position.Y * Width;
 
         public int GetHaliteAt(int x, int y) => Halite[x + y * Width];
+        public int GetHaliteAt(Position position) => Halite[position.X + position.Y * Width];
         public int GetHaliteAt(Ship ship) => Halite[ship.Position.X + ship.Position.Y * Width];
 
         public void ChangeHaliteAt(Ship ship, int diff)
@@ -53,6 +55,16 @@ namespace HaliteGameBot.Search
             }
         }
 
+        public void ApplyUpdate(GameMapUpdate mapUpdate) => Halite[mapUpdate.CellIndex] = mapUpdate.Halite;
+
         public bool IsDropoffAt(Ship ship) => Dropoffs.Contains(ship.Position.X + ship.Position.Y * Width);
+        public bool IsDropoffAt(Position position) => Dropoffs.Contains(position.X + position.Y * Width);
+
+        public bool IsDropoffAt(GameAction gameAction)
+        {
+            int x = gameAction.Ship.X;
+            int y = gameAction.Ship.Y;
+            return Dropoffs.Contains(x + y * Width);
+        }
     }
 }

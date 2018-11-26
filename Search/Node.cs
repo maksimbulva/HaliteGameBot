@@ -1,12 +1,11 @@
-﻿using HaliteGameBot.Search.GameActions;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace HaliteGameBot.Search
 {
     internal sealed class Node
     {
         public Node Parent { get; private set; }
-        public IGameAction GameAction { get; private set; }
+        public GameAction GameAction { get; private set; }
         public int Depth { get; private set; }
 
         public double Evaluation;
@@ -18,14 +17,16 @@ namespace HaliteGameBot.Search
 
         public double BestChildEvaluation { get; private set; } = double.MinValue;
 
-        public Node(Node parent, IGameAction gameAction, int depth)
+        public bool IsRoot => Depth == Tree.ROOT_DEPTH;
+
+        public Node(Node parent, GameAction gameAction, int depth)
         {
             Parent = parent;
             GameAction = gameAction;
             Depth = depth;
         }
 
-        public void Reuse(Node parent, IGameAction gameAction, int depth)
+        public void Reuse(Node parent, GameAction gameAction, int depth)
         {
             Parent = parent;
             GameAction = gameAction;
@@ -43,7 +44,7 @@ namespace HaliteGameBot.Search
             BestChildEvaluation = double.MinValue;
         }
 
-        public Node AddChild(IGameAction gameAction, double priority, double evaluation)
+        public Node AddChild(GameAction gameAction, double priority, double evaluation)
         {
             if (Children == null)
             {
@@ -83,12 +84,12 @@ namespace HaliteGameBot.Search
             return true;
         }
 
-        public void GetParents(List<Node> buffer)
+        public void FillWithParents(Stack<Node> buffer)
         {
             buffer.Clear();
             for (Node curNode = this; curNode != null; curNode = curNode.Parent)
             {
-                buffer.Add(curNode);
+                buffer.Push(curNode);
             }
         }
 

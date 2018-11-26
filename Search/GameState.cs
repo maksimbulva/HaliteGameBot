@@ -1,71 +1,79 @@
 ﻿using System.Collections.Generic;
 using HaliteGameBot.Framework;
-using HaliteGameBot.Search.GameActions;
 
 namespace HaliteGameBot.Search
 {
     internal sealed class GameState
     {
-        private readonly PlayerState _playerState;
-        private readonly GameMapState _gameMapState;
-        private readonly Stack<IGameAction> _actions = new Stack<IGameAction>(32);
-
-        public GameState(PlayerState playerState, GameMapState gameMapState)
+        private static readonly GameActions[] _moveDirOrder = new GameActions[4]
         {
-            _playerState = playerState;
+            GameActions.MOVE_NORTH,
+            GameActions.MOVE_WEST,
+            GameActions.MOVE_EAST,
+            GameActions.MOVE_SOUTH
+        };
+
+        private readonly GameMapState _gameMapState;
+        private readonly Stack<GameAction> _gameActions = new Stack<GameAction>(32);
+        private readonly Stack<GameMapUpdate> _undoStack = new Stack<GameMapUpdate>(32);
+
+        private readonly Position[] _moveDirBuffer = new Position[4];
+
+        public GameAction RecentGameAction => _gameActions.Count > 0 ? _gameActions.Peek() : null;
+
+        public GameState(GameMapState gameMapState)
+        {
             _gameMapState = gameMapState;
         }
 
-        public void Play(IGameAction action)
+        public void Play(GameAction gameAction)
         {
-            _actions.Push(action);
-            action.Play(_playerState, _gameMapState);
+            _gameActions.Push(gameAction);
+            int cellIndex = _gameMapState.GetCellIndex(gameAction.Ship.X, gameAction.Ship.Y);
+            _undoStack.Push(new GameMapUpdate(cellIndex, _gameMapState.Halite[cellIndex]));
+            _gameMapState.Halite[cellIndex] = gameAction.CellHalite;
         }
 
         public void Undo()
         {
-            IGameAction action = _actions.Pop();
-            action.Undo(_playerState, _gameMapState);
+            _gameActions.Pop();
+            _gameMapState.ApplyUpdate(_undoStack.Pop());
         }
 
         public void UndoAll()
         {
-            while (_actions.Count > 0)
+            while (_gameActions.Count > 0)
             {
                 Undo();
             }
         }
 
-        // TODO: consider using IEnumerable<IGameAction> here
-        public List<IGameAction> GenerateActions(Ship ship)
+        public List<GameAction> GenerateChildrenActions(GameAction parent)
         {
-            List<IGameAction> results = new List<IGameAction>(8)
+            List<GameAction> results = new List<GameAction>(8)
             {
-                new StayStill(_gameMapState, ship)
+                GameAction.CreateStayStillAction(parent, _gameMapState.IsDropoffAt(parent))
             };
 
-            var moveUp = new MoveY(_gameMapState, ship, MoveY.MoveDir.NORTH);
-            if (moveUp.MoveCost <= _playerState.Halite)
-            {
-                results.Add(moveUp);
-            }
+            _moveDirBuffer[0] = new Position(parent.Ship.X, _gameMapState.ToNorthOf(parent.Ship.Y));
+            _moveDirBuffer[1] = new Position(_gameMapState.ToLeftOf(parent.Ship.X), parent.Ship.Y);
+            _moveDirBuffer[2] = new Position(_gameMapState.ToRightOf(parent.Ship.X), parent.Ship.Y);
+            _moveDirBuffer[3] = new Position(parent.Ship.X, _gameMapState.ToSouthOf(parent.Ship.Y));
 
-            var moveDown = new MoveY(_gameMapState, ship, MoveY.MoveDir.SOUTH);
-            if (moveDown.MoveCost <= _playerState.Halite)
+            for (int i = 0; i < _moveDirBuffer.Length; ++i)
             {
-                results.Add(moveDown);
-            }
-
-            var moveLeft = new MoveX(_gameMapState, ship, MoveX.MoveDir.LEFT);
-            if (moveLeft.MoveCost <= _playerState.Halite)
-            {
-                results.Add(moveLeft);
-            }
-
-            var moveRight = new MoveX(_gameMapState, ship, MoveX.MoveDir.RIGHT);
-            if (moveRight.MoveCost <= _playerState.Halite)
-            {
-                results.Add(moveRight);
+                Position pos = _moveDirBuffer[i];
+                GameAction moveAction = GameAction.CreateMoveAction(
+                    _moveDirOrder[i],
+                    parent,
+                    pos.X,
+                    pos.Y,
+                    _gameMapState.GetHaliteAt(pos),
+                    _gameMapState.IsDropoffAt(pos));
+                if (moveAction != null)
+                {
+                    results.Add(moveAction);
+                }
             }
 
             return results;

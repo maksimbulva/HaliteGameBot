@@ -32,16 +32,21 @@ namespace HaliteGameBot
             Log.Write($"{myPlayer.Halite} halite, {myPlayer.Ships.Count} ships, {myPlayer.Dropoffs.Count} dropoffs");
 
             _commandsBuffer.Clear();
+            HashSet<int> bannedCells = null;
 
             if (_game.TurnNumber <= 200
                 && myPlayer.Halite >= Constants.ShipCost + 1500)
             {
                 _commandsBuffer.Add(Factory.CreateSpawnShipCommand());
+                bannedCells = new HashSet<int>(1) { gameMap.GetIndex(myPlayer.Shipyard.Position) };
                 Log.Write("Spawn new ship");
             }
 
+            _strategy.BasePlayerHalite = myPlayer.Halite;
+
             _searchManager.OnGameUpdated();
-            _searchManager.RunAll();
+            _searchManager.RunAll(bannedCells);
+
             _commandsBuffer.AddRange(_searchManager.CollectCommands());
 
             return _commandsBuffer;

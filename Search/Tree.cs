@@ -2,7 +2,7 @@
 {
     internal sealed class Tree
     {
-        private const int ROOT_DEPTH = 0;
+        public const int ROOT_DEPTH = 0;
 
         public Node Root { get; } = new Node(null, null, ROOT_DEPTH);
 

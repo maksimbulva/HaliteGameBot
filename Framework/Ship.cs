@@ -11,5 +11,7 @@
         {
             Halite = halite;
         }
+
+        public override string ToString() => $"({Position}) ${Halite}";
     }
 }

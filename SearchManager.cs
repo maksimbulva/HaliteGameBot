@@ -1,5 +1,6 @@
 ﻿using HaliteGameBot.Framework;
 using HaliteGameBot.Framework.Commands;
+using HaliteGameBot.Search;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -34,13 +35,13 @@ namespace HaliteGameBot
             _searches.ForEach(search => search.UpdateMap(_game.MapUpdates, _dropoffCells));
         }
 
-        public void RunAll()
+        public void RunAll(HashSet<int> bannedCells)
         {
             // TODO: run all searches in parallel
             var myShips = _game.MyPlayer.Ships;
             for (int i = 0; i < myShips.Count; ++i)
             {
-                _searches[i].Run(_game, myShips[i]);
+                _searches[i].Run(_game, myShips[i], bannedCells);
             }
         }
 
@@ -58,13 +59,18 @@ namespace HaliteGameBot
             foreach (int i in sortedIndices)
             {
                 Search.Search search = _searches[sortedIndices[i]];
-                var branches = search.Results.Branches;
-                var acceptableBranch = branches?.First(branchData =>
-                    !_blockedCells.Contains(_gameMap.GetIndex(branchData.GameAction.Destination)));
-
-                if (acceptableBranch != null)
+                foreach (var branchData in search.Results.Branches)
                 {
-                    _commandsBuffer.Add(CommandFactory.FromAction(acceptableBranch.GameAction, search.Results.EntityId));
+                    GameAction gameAction = branchData.GameAction;
+                    int cellIndex = _gameMap.GetIndex(gameAction.Ship.X, gameAction.Ship.Y);
+                    if (!_blockedCells.Contains(cellIndex))
+                    {
+                        _commandsBuffer.Add(CommandFactory.FromGameAction(
+                            gameAction.ActionType,
+                            search.Results.EntityId));
+                        _blockedCells.Add(cellIndex);
+                        break;
+                    }
                 }
             }
 

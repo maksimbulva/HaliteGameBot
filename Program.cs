@@ -25,6 +25,7 @@ namespace HaliteGameBot
             while (true)
             {
                 game.ReadFrameUpdate();
+                Log.Write("Ships: " + string.Join(", ", game.MyPlayer.Ships));
                 var commands = bot.GenerateTurnCommands();
                 string turnOutput = string.Join(" ", commands.Select(command => command.ToString()).ToArray());
                 Console.WriteLine(turnOutput);
