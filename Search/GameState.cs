@@ -21,6 +21,8 @@ namespace HaliteGameBot.Search
 
         public GameAction RecentGameAction => _gameActions.Count > 0 ? _gameActions.Peek() : null;
 
+        public int Depth => _gameActions.Count;
+
         public GameState(GameMapState gameMapState)
         {
             _gameMapState = gameMapState;
