@@ -15,7 +15,7 @@ namespace HaliteGameBot
         public MyBot(Game game)
         {
             _game = game;
-            _strategy = new Strategy();
+            _strategy = new Strategy(game);
             _searchManager = new SearchManager(_game, _strategy);
         }
 

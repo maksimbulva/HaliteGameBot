@@ -15,6 +15,8 @@ namespace HaliteGameBot
 
             Log.SetFileName($"bot-{game.MyPlayer.Id}.log");
 
+            GameMapGeometry.InitDimensions(game.GameMap);
+
             MyBot bot = new MyBot(game);
             bot.Initialize();
 
