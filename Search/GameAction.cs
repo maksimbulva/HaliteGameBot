@@ -14,31 +14,32 @@ namespace HaliteGameBot.Search
         public readonly int OriginCellHalite;
         public readonly int OriginCellIndex;
 
-        public static GameAction CreateStayStillAction(GameAction parent, bool dropoff)
+        public static GameAction CreateStayStillAction(GameAction parent, int cellHalite, bool dropoff)
         {
-            int newCellHalite = Math.Min(
-                parent.Ship.Halite + GameMechanicsHelper.HaliteToCollect(parent.OriginCellHalite),
+            int newShipHalite = Math.Min(
+                parent.Ship.Halite + GameMechanicsHelper.HaliteToCollect(cellHalite),
                 Constants.MaxHalite);
 
-            int haliteCollected = newCellHalite - parent.Ship.Halite;
+            int haliteCollected = newShipHalite - parent.Ship.Halite;
+            int cellIndex = GameMapGeometry.CellIndex(parent.Ship.X, parent.Ship.Y);
 
             if (dropoff)
             {
                 return new GameAction(
                     GameActions.STAY_STILL,
-                    parent.Player.WithHalite(parent.Ship.Halite + haliteCollected),
+                    parent.Player.WithHalite(parent.Player.Halite + newShipHalite),
                     parent.Ship.WithHalite(0),
-                    newCellHalite,
-                    parent.OriginCellIndex);
+                    cellHalite - haliteCollected,
+                    cellIndex);
             }
             else
             {
                 return new GameAction(
                     GameActions.STAY_STILL,
                     parent.Player,
-                    parent.Ship.WithHalite(parent.Ship.Halite + haliteCollected),
-                    newCellHalite,
-                    parent.OriginCellIndex);
+                    parent.Ship.WithHalite(newShipHalite),
+                    cellHalite - haliteCollected,
+                    cellIndex);
             }
         }
 

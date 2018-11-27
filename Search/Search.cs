@@ -11,7 +11,12 @@ namespace HaliteGameBot.Search
         private readonly Strategy _strategy;
 
         private readonly Tree _tree = new Tree();
-        private readonly PriorityQueue _priorityQueue;
+
+        private readonly Heap[] _heaps = new Heap[2]
+        {
+            new Heap(),
+            new Heap()
+        };
 
         private readonly Stack<Node> _parentsBuffer = new Stack<Node>(32);
 
@@ -27,15 +32,14 @@ namespace HaliteGameBot.Search
         public Search(Game game, Strategy strategy, int queueCapacity)
         {
             _gameMapState = new GameMapState(game);
-
             _strategy = strategy;
-            _priorityQueue = new PriorityQueue(queueCapacity);
         }
 
         public void Clear()
         {
             _tree.Clear();
-            _priorityQueue.Clear();
+            _heaps[0].Clear();
+            _heaps[1].Clear();
             Results = null;
         }
 
@@ -47,7 +51,7 @@ namespace HaliteGameBot.Search
 
         public void Run(Game game, Ship ship, HashSet<int> bannedCells)
         {
-            if (!_priorityQueue.IsEmpty)
+            if (_tree.Root.Children != null || _heaps[0].Count > 0 || Results != null)
             {
                 throw new Exception("Call Clear() before calling new Run()");
             }
@@ -55,19 +59,35 @@ namespace HaliteGameBot.Search
             _tree.Root.Reuse(null, GameAction.CreateRootAction(game, ship), Tree.ROOT_DEPTH);
 
             _stats = new SearchStats();
-            _priorityQueue.Enqueue(_tree.Root);
 
-            // TODO - for the moment, limit the number of nodes to 100
-            for (int i = 0; i < 100 && !_priorityQueue.IsEmpty; ++i)
+            int curDepthHeapIndex = 0;
+            _heaps[curDepthHeapIndex].TryAdd(_tree.Root);
+
+            for (int depth = Tree.ROOT_DEPTH; depth < 2; ++depth)
             {
-                ProcessNode(_priorityQueue.Dequeue(), ship, game, _strategy, bannedCells);
+                Heap curDepthHeap = _heaps[curDepthHeapIndex];
+                Heap nextDepthHeap = _heaps[1 - curDepthHeapIndex];
+                nextDepthHeap.Clear();
+
+                curDepthHeap.ForEach(node =>
+                {
+                    ProcessNode(node, nextDepthHeap, depth == Tree.ROOT_DEPTH ? bannedCells : null);
+                    _tree.EvaluateAndPropagate(node);
+                });
+
+                curDepthHeapIndex = 1 - curDepthHeapIndex;
+
+                if (_tree.Root.Children == null || _tree.Root.Children.Count == 1 || nextDepthHeap.Count == 0)
+                {
+                    break;
+                }
             }
 
             _stats.OnSearchFinished();
             Results = new SearchResults(ship, _tree.Root.Children);
         }
 
-        private void ProcessNode(Node node, Ship ship, Game game, Strategy strategy, HashSet<int> bannedCells)
+        private void ProcessNode(Node node, Heap nextDepthHeap, HashSet<int> bannedCells)
         {
             // TODO - creating a new object of this type is expensive
             GameState gameState = new GameState(_gameMapState);
@@ -84,33 +104,29 @@ namespace HaliteGameBot.Search
                 ++_stats.ActionCount;
 
                 gameState.Play(gameAction);
+                if (bannedCells != null && IsBanned(gameAction, bannedCells))
+                {
+                    continue;
+                }
 
                 double evaluation = _strategy.EvaluateStatic(gameState);
-                double priority = _strategy.GetPriority(evaluation, node.Depth + 1);
-
-                if (_priorityQueue.WillEnqueue(priority)
-                    && !(node.IsRoot && IsBanned(gameAction, bannedCells)))
+                if (nextDepthHeap.WillAdd(evaluation))
                 {
                     ++_stats.NodeCount;
-                    Node child = node.AddChild(gameAction, priority, evaluation);
-                    _priorityQueue.Enqueue(child);
+                    Node child = node.AddChild(gameAction, evaluation);
+                    nextDepthHeap.TryAdd(child);
                 }
 
                 gameState.Undo();
             }
 
-            _tree.SetEvaluation(node, node.BestChildEvaluation);
             gameState.UndoAll();
         }
 
         private bool IsBanned(GameAction gameAction, HashSet<int> bannedCells)
         {
-            if (bannedCells != null)
-            {
-                int cellIndex = _gameMapState.GetCellIndex(gameAction.Ship.X, gameAction.Ship.Y);
-                return bannedCells.Contains(cellIndex);
-            }
-            return false;
+            int cellIndex = _gameMapState.GetCellIndex(gameAction.Ship.X, gameAction.Ship.Y);
+            return bannedCells.Contains(cellIndex);
         }
     }
 }

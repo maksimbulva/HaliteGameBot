@@ -29,18 +29,9 @@ namespace HaliteGameBot
 
             double shipHaliteBonus = Math.Max(0, 20 - distanceToShipyard) / 20.0 * gameAction.Ship.Halite;
 
-            // Penalize inaction
-            double depthPenalty = Math.Max(0, 20 - gameState.Depth) / 20.0;
-
             double result = gameAction.Player.Halite - BasePlayerHalite + shipHaliteBonus;
-            result *= depthPenalty;
 
             return result;
-        }
-
-        public double GetPriority(double evaluation, int depth)
-        {
-            return 0.33; // evaluation / (depth + 1);
         }
     }
 }

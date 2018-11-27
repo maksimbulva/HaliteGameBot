@@ -100,6 +100,7 @@ namespace HaliteGameBot
             {
                 _dropoffCells.Add(_gameMap.GetIndex(dropoff.Position));
             }
+            _dropoffCells.Add(_gameMap.GetIndex(_game.MyPlayer.Shipyard.Position));
         }
     }
 }

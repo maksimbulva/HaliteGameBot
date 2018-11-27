@@ -9,21 +9,19 @@ namespace HaliteGameBot.Search
         public int Depth { get; private set; }
 
         public double Evaluation;
-        public double Priority;
 
         public List<Node> Children { get; private set; }
 
         public Node BestChild { get; private set; }
 
-        public double BestChildEvaluation { get; private set; } = double.MinValue;
-
         public bool IsRoot => Depth == Tree.ROOT_DEPTH;
 
-        public Node(Node parent, GameAction gameAction, int depth)
+        public Node(Node parent, GameAction gameAction, int depth, double evaluation)
         {
             Parent = parent;
             GameAction = gameAction;
             Depth = depth;
+            Evaluation = evaluation;
         }
 
         public void Reuse(Node parent, GameAction gameAction, int depth)
@@ -32,7 +30,6 @@ namespace HaliteGameBot.Search
             GameAction = gameAction;
             Depth = depth;
             Evaluation = 0.0;
-            Priority = 0.0;
             ClearChildren();
         }
 
@@ -41,45 +38,75 @@ namespace HaliteGameBot.Search
             Children?.Clear();
             Children = null;
             BestChild = null;
-            BestChildEvaluation = double.MinValue;
         }
 
-        public Node AddChild(GameAction gameAction, double priority, double evaluation)
+        public Node AddChild(GameAction gameAction, double evaluation)
         {
             if (Children == null)
             {
                 // TODO - use memory pool
-                Children = new List<Node>(6);
+                Children = new List<Node>(5);
             }
-            Node child = new Node(this, gameAction, Depth + 1)
-            {
-                Priority = priority,
-                Evaluation = evaluation
-            };
+            Node child = new Node(this, gameAction, Depth + 1, evaluation);
             Children.Add(child);
-            OnChildEvaluated(child, evaluation);
             return child;
         }
 
-        // Returns true if evaluation of the current node has changed
-        public bool OnChildEvaluated(Node child, double childEvaluation)
+        public void RemoveChild(Node node)
         {
-            if (BestChild != null && childEvaluation < BestChildEvaluation)
+            for (int i = 0; i < Children.Count; ++i)
+            {
+                if (ReferenceEquals(node, Children[i]))
+                {
+                    Children[i] = Children[Children.Count - 1];
+                    Children.RemoveAt(Children.Count - 1);
+                }
+            }
+            if (ReferenceEquals(node, BestChild))
+            {
+                if (Children.Count > 0)
+                {
+                    BestChild = FindBestChild();
+                    Evaluation = BestChild.Evaluation;
+                }
+                else
+                {
+                    BestChild = null;
+                    Evaluation = double.MinValue;
+                }
+            }
+        }
+
+        public bool EvaluateFromChildren()
+        {
+            if (Children != null && Children.Count > 0)
+            {
+                BestChild = FindBestChild();
+                Evaluation = BestChild.Evaluation;
+                return true;
+            }
+            return false;
+        }
+
+        // Returns true if evaluation of the current node has changed
+        public bool OnChildEvaluated(Node child)
+        {
+            if (Evaluation > child.Evaluation)
             {
                 // This is not the best child
                 return false;
             }
-            if (BestChild == child && childEvaluation < BestChildEvaluation)
+            if (ReferenceEquals(BestChild, child) && child.Evaluation < BestChild.Evaluation)
             {
                 // Best child evaluation has changed, and it became lower
                 // Possibly the child is not the best child anymore
                 BestChild = FindBestChild();
-                BestChildEvaluation = BestChild.Evaluation;
+                Evaluation = BestChild.Evaluation;
             }
             else
             {
                 BestChild = child;
-                BestChildEvaluation = childEvaluation;
+                Evaluation = BestChild.Evaluation;
             }
             return true;
         }
@@ -99,7 +126,7 @@ namespace HaliteGameBot.Search
             double bestEvaluation = bestChild.Evaluation;
             for (int i = 1; i < Children.Count; ++i)
             {
-                Node curChild = Children[1];
+                Node curChild = Children[i];
                 if (curChild.Evaluation > bestEvaluation)
                 {
                     bestChild = curChild;

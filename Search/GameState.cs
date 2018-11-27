@@ -31,9 +31,9 @@ namespace HaliteGameBot.Search
         public void Play(GameAction gameAction)
         {
             _gameActions.Push(gameAction);
-            int cellIndex = _gameMapState.GetCellIndex(gameAction.Ship.X, gameAction.Ship.Y);
-            _undoStack.Push(new GameMapUpdate(cellIndex, _gameMapState.Halite[cellIndex]));
-            _gameMapState.Halite[cellIndex] = gameAction.OriginCellHalite;
+            int oldHaliteAtOrigin = _gameMapState.Halite[gameAction.OriginCellIndex];
+            _undoStack.Push(new GameMapUpdate(gameAction.OriginCellIndex, oldHaliteAtOrigin));
+            _gameMapState.Halite[gameAction.OriginCellIndex] = gameAction.OriginCellHalite;
         }
 
         public void Undo()
@@ -52,9 +52,12 @@ namespace HaliteGameBot.Search
 
         public List<GameAction> GenerateChildrenActions(GameAction parent)
         {
-            List<GameAction> results = new List<GameAction>(8)
+            List<GameAction> results = new List<GameAction>(5)
             {
-                GameAction.CreateStayStillAction(parent, _gameMapState.IsDropoffAt(parent))
+                GameAction.CreateStayStillAction(
+                    parent,
+                    _gameMapState.GetHaliteAt(parent.Ship.X, parent.Ship.Y),
+                    _gameMapState.IsDropoffAt(parent))
             };
 
             int originCellHalite = _gameMapState.GetHaliteAt(parent.Ship.X, parent.Ship.Y);

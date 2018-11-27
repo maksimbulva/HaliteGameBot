@@ -21,7 +21,7 @@ namespace HaliteGameBot.Search
 
         public void Clear()
         {
-            for (int i = 1; i < Count; ++i)
+            for (int i = 1; i <= Count; ++i)
             {
                 _items[i] = null;
             }
@@ -99,7 +99,7 @@ namespace HaliteGameBot.Search
 
         public void ForEach(Action<Node> action)
         {
-            for (int i = 1; i < Count; ++i)
+            for (int i = 1; i <= Count; ++i)
             {
                 action(_items[i]);
             }

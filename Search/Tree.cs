@@ -4,7 +4,7 @@
     {
         public const int ROOT_DEPTH = 0;
 
-        public Node Root { get; } = new Node(null, null, ROOT_DEPTH);
+        public Node Root { get; } = new Node(null, null, ROOT_DEPTH, double.NegativeInfinity);
 
         public void Clear()
         {
@@ -12,16 +12,39 @@
             Root.Reuse(null, null, ROOT_DEPTH);
         }
 
-        public void SetEvaluation(Node node, double evaluation)
+        public void EvaluateAndPropagate(Node node)
         {
-            node.Evaluation = evaluation;
-            while (node.Parent != null)
+            if (node.EvaluateFromChildren())
             {
-                if (!node.Parent.OnChildEvaluated(node, node.Evaluation)) 
+                PropagateEvaluation(node);
+            }
+            else
+            {
+                Remove(node);
+            }
+        }
+
+        private void PropagateEvaluation(Node node)
+        {
+            while (node.Parent != null && node.Parent.OnChildEvaluated(node))
+            {
+                node = node.Parent;
+            }
+        }
+
+        private void Remove(Node node)
+        {
+            while (node.Parent != null && !ReferenceEquals(node.Parent, Root))
+            {
+                node.Parent.RemoveChild(node);
+                if (node.Parent.BestChild == null)
+                {
+                    node = node.Parent;
+                }
+                else
                 {
                     break;
                 }
-                node = node.Parent;
             }
         }
 
